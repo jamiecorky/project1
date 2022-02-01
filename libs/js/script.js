@@ -1,27 +1,49 @@
   // Ajax request to PHP to populate the nav select with countries
-  $('document').ready(function() {
-    $.ajax({
-      url: "libs/php/getGeoJson.php",
-      type: 'GET',
-      dataType: 'json',
-      success: function(result) {
-        // console.log(JSON.stringify(result));
-        if (result.status.name == "ok") {
-          // console.log(result);
-          for (let i = 0; i <= result.data.length; i++) {
-            $('#country-select').append(`<option value=${result.data[i].iso_a2}>${result.data[i].name}</option>`);
-          } 
-        }
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        console.log('error')
+$('document').ready(function() {
+  $.ajax({
+    url: "libs/php/getGeoJson.php",
+    type: 'GET',
+    dataType: 'json',
+    success: function(result) {
+      // console.log(JSON.stringify(result));
+      if (result.status.name == "ok") {
+        // console.log(result);
+        for (let i = 0; i <= result.data.length; i++) {
+          $('#country-select').append(`<option value=${result.data[i].iso_a2}>${result.data[i].name}</option>`);
+        } 
       }
-    }); 
-  });
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log('error')
+    }
+  }); 
+});
+
+
+let myGeoJSON = [];
+
+$('document').ready(function() {
+  $.ajax({
+    url: "libs/php/getCountryBorders.php",
+    type: 'GET',
+    dataType: 'json',
+    success: function(result) {
+      if (result.status.name == "ok") {
+        for(let i = 0; i < result.data.length; i++){
+          myGeoJSON.push(result.data[i])
+        }         
+        L.geoJSON(myGeoJSON).addTo(map);
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log('error')
+    }
+  }); 
+});
 
 const accessToken = 'cOYvUkIr2QTC1XUq4cllxAvdITUWUPMEJp9b84EhqypFuJabteMQtGFND8eBRj8n';
 const map = L.map('map');
-map.locate({setView: true, maxZoom: 16});
+map.locate({setView: true, maxZoom: 4});
 
 function onLocationFound(e) {
   var radius = e.accuracy;
@@ -47,6 +69,15 @@ L.tileLayer(
   }
 ).addTo(map);
 
-map.createPane('countryborders');
-map.getPane('countryborders').style.zIndex = 650;
-map.getPane('countryborders').style.pointerEvents = 'none';
+const myStyle = {
+  "color": "#ff7800",
+  "weight": 5,
+  "opacity": 0.65
+};
+
+
+
+console.log(myGeoJSON);
+//console.log(hungary);
+L.geoJSON(myGeoJSON).addTo(map);
+
