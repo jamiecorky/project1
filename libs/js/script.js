@@ -9,7 +9,7 @@ $('document').ready(function() {
       if (result.status.name == "ok") {
         // console.log(result);
         for (let i = 0; i <= result.data.length; i++) {
-          $('#country-select').append(`<option value=${result.data[i].iso_a2}>${result.data[i].name}</option>`);
+          $('#country-select').append(`<option name="country" value=${result.data[i].iso_a2}>${result.data[i].name}</option>`);
         } 
       }
     },
@@ -32,7 +32,7 @@ $('document').ready(function() {
         for(let i = 0; i < result.data.length; i++){
           myGeoJSON.push(result.data[i])
         }         
-        L.geoJSON(myGeoJSON).addTo(map);
+        L.geoJSON(myGeoJSON, {style: myStyle}).addTo(map);
       }
     },
     error: function(jqXHR, textStatus, errorThrown) {
@@ -43,7 +43,7 @@ $('document').ready(function() {
 
 const accessToken = 'cOYvUkIr2QTC1XUq4cllxAvdITUWUPMEJp9b84EhqypFuJabteMQtGFND8eBRj8n';
 const map = L.map('map');
-map.locate({setView: true, maxZoom: 4});
+map.locate({setView: true, maxZoom: 8});
 
 function onLocationFound(e) {
   var radius = e.accuracy;
@@ -70,14 +70,38 @@ L.tileLayer(
 ).addTo(map);
 
 const myStyle = {
-  "color": "#ff7800",
+  "color": "#00ff00",
   "weight": 5,
-  "opacity": 0.65
+  "opacity": 0.5,
+  "fillOpacity": 0
 };
 
 
+$('#country-select').change(function() {
 
-console.log(myGeoJSON);
-//console.log(hungary);
-L.geoJSON(myGeoJSON).addTo(map);
+  $.ajax({
+    url: "libs/php/countryCodeToLatLng.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+      id: $('#country-select').val()
+    },
+    success: function(result) {
 
+      console.log(JSON.stringify(result));
+
+      if (result.status.name == "ok") {
+        let latlng = new L.latLng(result.data[0], result.data[1]);
+        map.panTo(latlng);
+        console.log(result.data[0]);
+      //  $('#placetxt').html(result['data'][0]['placeName']);
+      //  $('#areatxt').html(result['data'][0]['adminName2']);
+      }
+    
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log('oops, error')
+    }
+  }); 
+
+});
