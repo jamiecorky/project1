@@ -1,0 +1,28 @@
+#navpin {
+	margin-right: -10px;
+}
+
+body {
+	padding: 0;
+	margin: 0;
+}
+html,
+body,
+#map {
+	height: 100vh;
+	width: 100vw;
+}
+
+.leaflet-control-zoom {
+	top: 55px;
+}
+
+@media screen and (max-width: 575px) {
+	#navpin {
+		margin-right: 0px;
+	}
+
+	.leaflet-control-zoom {
+		top: 95px;
+	}
+}
