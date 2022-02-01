@@ -1,3 +1,24 @@
+  // Ajax request to PHP to populate the nav select with countries
+  $('document').ready(function() {
+    $.ajax({
+      url: "libs/php/getGeoJson.php",
+      type: 'GET',
+      dataType: 'json',
+      success: function(result) {
+        // console.log(JSON.stringify(result));
+        if (result.status.name == "ok") {
+          // console.log(result);
+          for (let i = 0; i <= result.data.length; i++) {
+            $('#country-select').append(`<option value=${result.data[i].iso_a2}>${result.data[i].name}</option>`);
+          } 
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log('error')
+      }
+    }); 
+  });
+
 const accessToken = 'cOYvUkIr2QTC1XUq4cllxAvdITUWUPMEJp9b84EhqypFuJabteMQtGFND8eBRj8n';
 const map = L.map('map');
 map.locate({setView: true, maxZoom: 16});
@@ -26,32 +47,6 @@ L.tileLayer(
   }
 ).addTo(map);
 
-$('document').ready(function() {
-  $.ajax({
-    url: "libs/php/getGeoJson.php",
-    type: 'GET',
-    dataType: 'json',
-    success: function(result) {
-
-      console.log(JSON.stringify(result));
-
-      if (result.status.name == "ok") {
-        console.log('works')
-      
-      }
-    
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      console.log('error')
-    }
-  }); 
-});
-
-
-
-// $.getJSON("/libs/js/countryBorders.geo.json", function(data) {
-//   for (let i = 0; i <= data.features.length; i++) {
-//     $('#country-select').append(`<option value=${data.features[i].properties.iso_a2}>${data.features[i].properties.name}<option>`);
-//     console.log(data.features[i])
-//     }
-// });
+map.createPane('countryborders');
+map.getPane('countryborders').style.zIndex = 650;
+map.getPane('countryborders').style.pointerEvents = 'none';
