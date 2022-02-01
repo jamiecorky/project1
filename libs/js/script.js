@@ -28,7 +28,7 @@ L.tileLayer(
 
 $('document').ready(function() {
   $.ajax({
-    url: "/libs/php/getGeoJson.php",
+    url: "libs/php/getGeoJson.php",
     type: 'GET',
     dataType: 'json',
     success: function(result) {
