@@ -5,9 +5,7 @@ $('document').ready(function() {
     type: 'GET',
     dataType: 'json',
     success: function(result) {
-      // console.log(JSON.stringify(result));
       if (result.status.name == "ok") {
-        // console.log(result);
         for (let i = 0; i <= result.data.length; i++) {
           $('#country-select').append(`<option name="country" value=${result.data[i].iso_a2}>${result.data[i].name}</option>`);
         } 
@@ -19,9 +17,10 @@ $('document').ready(function() {
   }); 
 });
 
-
+// Array that will contain GeoJSON data
 let myGeoJSON = [];
 
+// Returns GeoJSON data and pushes it to myGeoJSON array above.
 $('document').ready(function() {
   $.ajax({
     url: "libs/php/getCountryBorders.php",
@@ -30,21 +29,26 @@ $('document').ready(function() {
     success: function(result) {
       if (result.status.name == "ok") {
         for(let i = 0; i < result.data.length; i++){
-          myGeoJSON.push(result.data[i])
+          myGeoJSON.push(result.data[i]);
         }         
+        // This line is only working within here, won't work outside of the function?
         L.geoJSON(myGeoJSON, {style: myStyle}).addTo(map);
       }
     },
     error: function(jqXHR, textStatus, errorThrown) {
-      console.log('error')
+      console.log('error');
     }
   }); 
 });
 
+
 const accessToken = 'cOYvUkIr2QTC1XUq4cllxAvdITUWUPMEJp9b84EhqypFuJabteMQtGFND8eBRj8n';
 const map = L.map('map');
+
+// Built in function for finding your location
 map.locate({setView: true, maxZoom: 8});
 
+// Function for when you are found on map to display pop up
 function onLocationFound(e) {
   var radius = e.accuracy;
 
@@ -59,9 +63,9 @@ function onLocationError(e) {
 }
 
 map.on('locationerror', onLocationError);
-
 map.on('locationfound', onLocationFound);
 
+// Map tiles 
 L.tileLayer(
   `https://tile.jawg.io/jawg-matrix/{z}/{x}/{y}.png?access-token=${accessToken}`, {
     attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a> | <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">&copy; OSM contributors</a>',
@@ -69,6 +73,7 @@ L.tileLayer(
   }
 ).addTo(map);
 
+// Style for map geoJSON country overlay (to be changed as a conditional on data)
 const myStyle = {
   "color": "#00ff00",
   "weight": 5,
@@ -76,9 +81,8 @@ const myStyle = {
   "fillOpacity": 0
 };
 
-
+// This changes the location on the map to take you to the country selected in the dropdown.
 $('#country-select').change(function() {
-
   $.ajax({
     url: "libs/php/countryCodeToLatLng.php",
     type: 'POST',
@@ -87,21 +91,15 @@ $('#country-select').change(function() {
       id: $('#country-select').val()
     },
     success: function(result) {
-
-      console.log(JSON.stringify(result));
-
+      //console.log(JSON.stringify(result));
       if (result.status.name == "ok") {
         let latlng = new L.latLng(result.data[0], result.data[1]);
         map.panTo(latlng);
-        console.log(result.data[0]);
-      //  $('#placetxt').html(result['data'][0]['placeName']);
-      //  $('#areatxt').html(result['data'][0]['adminName2']);
+        //console.log(result.data[0]);
       }
-    
     },
     error: function(jqXHR, textStatus, errorThrown) {
       console.log('oops, error')
     }
   }); 
-
 });
