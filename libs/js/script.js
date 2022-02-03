@@ -75,6 +75,16 @@ function onEachFeature(feature, layer) {
     click: zoomToFeature,
   });
 }  
+
+// const personIcon = L.icon({
+//   iconUrl: '../libs/img/tourist',
+
+//   iconSize:     [38, 95], // size of the icon
+//   shadowSize:   [50, 64], // size of the shadow
+//   iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+//   shadowAnchor: [4, 62],  // the same for the shadow
+//   popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+// });
   
   // Ajax request to PHP to populate the nav select with countries
 $('document').ready(function() {
@@ -98,60 +108,31 @@ $('document').ready(function() {
 // // Array that will contain GeoJSON data
 let myGeoJSON = [];
 
-// Returns GeoJSON data and pushes it to myGeoJSON array above.
-// $('document').ready(function() {
-//   $.ajax({
-//     url: "libs/php/getCountryBorders.php",
-//     type: 'GET',
-//     dataType: 'json',
-//     success: function(result) {
-//       if (result.status.name == "ok") {
-//         for(let i = 0; i < result.data.length; i++){
-//           myGeoJSON.push(result.data[i]);
-//         }         
-//         // This line is only working within here, won't work outside of the function?
-//         geojson = L.geoJson(myGeoJSON, {
-//           style: style,
-//           onEachFeature: onEachFeature
-//         }).addTo(map);
-//       }
-//     },
-//     error: function(jqXHR, textStatus, errorThrown) {
-//       console.log('error');
-//     }
-//   }); 
-// });
-
-// Trying to re-code the function below to set the map bounds to the geoJSON data when the select option is changed. 
 $('#country-select').change(function() {
+  const countryName = $('#country-select option:selected').text();
+  const countryVal = $('#country-select option:selected').val();
   $.ajax({
     url: "libs/php/getCountryBorders.php",
     type: 'POST',
     dataType: 'json',
+    data: { name: countryName, 
+            value: countryVal
+          },
     success: function(result) {
       if (result.status.name == "ok") {
-        let countryName = $('#country-select option:selected').text()
-        for (let i = 0; i <= result.data.length; i++) {
-          if (result.data[i].properties.name == countryName) {
-            console.log(result.data[i].properties.name)
-            console.log(result.data[i])
-            myGeoJSON.push(result.data[i]);
-            geojson = L.geoJson(myGeoJSON, {
-              style: style,
-              onEachFeature: onEachFeature
-            }).addTo(map);
-          }
-        }
+          myGeoJSON.push(result.returnBorder[0])
+          geojson = L.geoJson(myGeoJSON, {
+          style: style,
+          onEachFeature: onEachFeature
+          }).addTo(map);
+          map.fitBounds(geojson.getBounds());
+          // The function below should clear all previous feature data on the map, this would need to happen before the current selection
+          //geojson.clearLayers();
 
-        
-        
-        
-        // for (let i = 0; i <= result.data.length; i++) {
-        //   $('#country-select').text() 
-        // } 
-        //map.fitBounds([result.data[0]]);
-          // console.log(result.data[6]);
-          // map.fitBounds(result.data[6].geometry.coordinates);          
+          // SHOULD take away the previous country data when a new country is selected because fitbounds will fit all countries in this case.
+          if (myGeoJSON.length >= 1) {
+            myGeoJSON.shift();
+          }
       }
     },
     error: function(jqXHR, textStatus, errorThrown) {
@@ -159,28 +140,3 @@ $('#country-select').change(function() {
     }
   }); 
 });
-
-
-// This changes the location on the map to take you to the country selected in the dropdown.
-// $('#country-select').change(function() {
-//   $.ajax({
-//     url: "libs/php/countryCodeToLatLng.php",
-//     type: 'POST',
-//     dataType: 'json',
-//     data: {
-//       id: $('#country-select').val()
-//     },
-//     success: function(result) {
-//       //console.log(JSON.stringify(result));
-//       if (result.status.name == "ok") {
-//         let latlng = new L.latLng(result.data[0], result.data[1]);
-// Changed this line to fitBounds - won't work due to latlng being a single point.
-//         map.fitBounds([latlng]);
-//         //console.log(result.data[0]);
-//       }
-//     },
-//     error: function(jqXHR, textStatus, errorThrown) {
-//       console.log('oops, error')
-//     }
-//   }); 
-// });
