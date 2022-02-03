@@ -67,12 +67,12 @@ function resetHighlight(e) {
 function zoomToFeature(e) {
   map.fitBounds(e.target.getBounds());
 }
-
+// Can I add something here to zoom to feature once I select the dropdown? tried - ready: zoomToFeature
 function onEachFeature(feature, layer) {
   layer.on({
     mouseover: highlightFeature,
     mouseout: resetHighlight,
-    click: zoomToFeature
+    click: zoomToFeature,
   });
 }  
   
@@ -99,43 +99,59 @@ $('document').ready(function() {
 let myGeoJSON = [];
 
 // Returns GeoJSON data and pushes it to myGeoJSON array above.
-$('document').ready(function() {
-  $.ajax({
-    url: "libs/php/getCountryBorders.php",
-    type: 'GET',
-    dataType: 'json',
-    success: function(result) {
-      if (result.status.name == "ok") {
-        for(let i = 0; i < result.data.length; i++){
-          myGeoJSON.push(result.data[i]);
-        }         
-        // This line is only working within here, won't work outside of the function?
-        geojson = L.geoJson(myGeoJSON, {
-          style: style,
-          onEachFeature: onEachFeature
-        }).addTo(map);
-      }
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      console.log('error');
-    }
-  }); 
-});
+// $('document').ready(function() {
+//   $.ajax({
+//     url: "libs/php/getCountryBorders.php",
+//     type: 'GET',
+//     dataType: 'json',
+//     success: function(result) {
+//       if (result.status.name == "ok") {
+//         for(let i = 0; i < result.data.length; i++){
+//           myGeoJSON.push(result.data[i]);
+//         }         
+//         // This line is only working within here, won't work outside of the function?
+//         geojson = L.geoJson(myGeoJSON, {
+//           style: style,
+//           onEachFeature: onEachFeature
+//         }).addTo(map);
+//       }
+//     },
+//     error: function(jqXHR, textStatus, errorThrown) {
+//       console.log('error');
+//     }
+//   }); 
+// });
 
 // Trying to re-code the function below to set the map bounds to the geoJSON data when the select option is changed. 
 $('#country-select').change(function() {
   $.ajax({
-    url: "libs/php/clickToMapBounds.php",
-    type: 'GET',
+    url: "libs/php/getCountryBorders.php",
+    type: 'POST',
     dataType: 'json',
     success: function(result) {
       if (result.status.name == "ok") {
+        let countryName = $('#country-select option:selected').text()
+        for (let i = 0; i <= result.data.length; i++) {
+          if (result.data[i].properties.name == countryName) {
+            console.log(result.data[i].properties.name)
+            console.log(result.data[i])
+            myGeoJSON.push(result.data[i]);
+            geojson = L.geoJson(myGeoJSON, {
+              style: style,
+              onEachFeature: onEachFeature
+            }).addTo(map);
+          }
+        }
+
+        
+        
+        
         // for (let i = 0; i <= result.data.length; i++) {
         //   $('#country-select').text() 
         // } 
         //map.fitBounds([result.data[0]]);
-          console.log(result.data[6]);
-          map.fitBounds(result.data[6].geometry.coordinates);          
+          // console.log(result.data[6]);
+          // map.fitBounds(result.data[6].geometry.coordinates);          
       }
     },
     error: function(jqXHR, textStatus, errorThrown) {
