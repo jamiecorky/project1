@@ -4,6 +4,8 @@ const map = L.map('map');
 // Built in function for finding your location
 map.locate({setView: true, maxZoom: 8});
 
+
+
 // Function for when you are found on map to display pop up
 function onLocationFound(e) {
   var radius = e.accuracy;
@@ -28,6 +30,22 @@ L.tileLayer(
     maxZoom: 22
   }
 ).addTo(map);
+
+// control that shows state info on hover
+var info = L.control();
+
+info.onAdd = function (map) {
+  this._div = L.DomUtil.create('div', 'info');
+  this.update();
+  return this._div;
+};
+
+info.update = function (props) {
+  this._div.innerHTML = '<h4>Country Info</h4>' +  (props ?
+    /*'<b>' + props.name + '</b><br />' + props.density +*/ ' Well done, you found a country' : 'Select a country for info');
+};
+
+info.addTo(map);
 
 
 function style(feature) {
@@ -55,19 +73,19 @@ function highlightFeature(e) {
     layer.bringToFront();
   }
 
-  //info.update(layer.feature.properties);
+  info.update(layer.feature.properties);
 }
 
 function resetHighlight(e) {
   geojson.resetStyle(e.target);
-  // info.update();
+  info.update();
 }
 
-// Zooms to feature on map when clicked
+
 function zoomToFeature(e) {
   map.fitBounds(e.target.getBounds());
 }
-// Can I add something here to zoom to feature once I select the dropdown? tried - ready: zoomToFeature
+
 function onEachFeature(feature, layer) {
   layer.on({
     mouseover: highlightFeature,
@@ -105,7 +123,8 @@ $('document').ready(function() {
   }); 
 });
 
-// // Array that will contain GeoJSON data
+// Global array being pushed geoJSON bounds
+let geojson;
 let myGeoJSON = [];
 
 $('#country-select').change(function() {
@@ -120,7 +139,12 @@ $('#country-select').change(function() {
           },
     success: function(result) {
       if (result.status.name == "ok") {
+          //pushes geoJSON data to array
           myGeoJSON.push(result.returnBorder[0])
+          if(geojson){
+            geojson.clearLayers()
+        }
+          //geojson being initiated as a layer? cannot clear layer before next line - takes in myGeoJSON for boundary data.
           geojson = L.geoJson(myGeoJSON, {
           style: style,
           onEachFeature: onEachFeature
