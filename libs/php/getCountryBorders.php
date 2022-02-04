@@ -26,6 +26,7 @@
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
   $output['returnBorder'] = $returnBorder; // returns only border info for that one country selected
+  $output['returnName'] = $cName;
   
 	header('Content-Type: application/json; charset=UTF-8');
 

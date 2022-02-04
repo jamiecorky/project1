@@ -1,10 +1,30 @@
+$(window).on('load', function () {
+  if ($('#preloader').length) {
+    $('#preloader').delay(1000).fadeOut('slow',function () {
+      $(this).remove();
+    });
+  }
+});
+
 const accessToken = 'cOYvUkIr2QTC1XUq4cllxAvdITUWUPMEJp9b84EhqypFuJabteMQtGFND8eBRj8n';
 const map = L.map('map');
 
 // Built in function for finding your location
 map.locate({setView: true, maxZoom: 8});
 
+//var info = L.control();
 
+var legend = L.control({position: 'topright'});
+
+        legend.onAdd = function (map) {
+
+          var div = L.DomUtil.create('div', 'info legend');
+          div.setAttribute('id', 'infobox');
+          div.innerHTML = "<b>Pick a country for more info</b>";
+          return div;
+        };
+
+        legend.addTo(map);
 
 // Function for when you are found on map to display pop up
 function onLocationFound(e) {
@@ -30,22 +50,6 @@ L.tileLayer(
     maxZoom: 22
   }
 ).addTo(map);
-
-// control that shows state info on hover
-var info = L.control();
-
-info.onAdd = function (map) {
-  this._div = L.DomUtil.create('div', 'info');
-  this.update();
-  return this._div;
-};
-
-info.update = function (props) {
-  this._div.innerHTML = '<h4>Country Info</h4>' +  (props ?
-    /*'<b>' + props.name + '</b><br />' + props.density +*/ ' Well done, you found a country' : 'Select a country for info');
-};
-
-info.addTo(map);
 
 
 function style(feature) {
@@ -73,12 +77,12 @@ function highlightFeature(e) {
     layer.bringToFront();
   }
 
-  info.update(layer.feature.properties);
+ // info.update(layer.feature.properties);
 }
 
 function resetHighlight(e) {
   geojson.resetStyle(e.target);
-  info.update();
+ // info.update();
 }
 
 
@@ -91,19 +95,10 @@ function onEachFeature(feature, layer) {
     mouseover: highlightFeature,
     mouseout: resetHighlight,
     click: zoomToFeature,
-  });
+    click: onMapClick,
+  });  
 }  
 
-// const personIcon = L.icon({
-//   iconUrl: '../libs/img/tourist',
-
-//   iconSize:     [38, 95], // size of the icon
-//   shadowSize:   [50, 64], // size of the shadow
-//   iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-//   shadowAnchor: [4, 62],  // the same for the shadow
-//   popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-// });
-  
   // Ajax request to PHP to populate the nav select with countries
 $('document').ready(function() {
   $.ajax({
@@ -126,6 +121,8 @@ $('document').ready(function() {
 // Global array being pushed geoJSON bounds
 let geojson;
 let myGeoJSON = [];
+let nameSelected = [];
+let countryInfo = [];
 
 $('#country-select').change(function() {
   const countryName = $('#country-select option:selected').text();
@@ -139,24 +136,21 @@ $('#country-select').change(function() {
           },
     success: function(result) {
       if (result.status.name == "ok") {
-          //pushes geoJSON data to array
           myGeoJSON.push(result.returnBorder[0])
+          nameSelected.push(result.returnName);
           if(geojson){
             geojson.clearLayers()
-        }
-          //geojson being initiated as a layer? cannot clear layer before next line - takes in myGeoJSON for boundary data.
+          }
           geojson = L.geoJson(myGeoJSON, {
           style: style,
           onEachFeature: onEachFeature
-          }).addTo(map);
-          map.fitBounds(geojson.getBounds());
-          // The function below should clear all previous feature data on the map, this would need to happen before the current selection
-          //geojson.clearLayers();
-
-          // SHOULD take away the previous country data when a new country is selected because fitbounds will fit all countries in this case.
-          if (myGeoJSON.length >= 1) {
-            myGeoJSON.shift();
-          }
+        }).addTo(map);
+        map.fitBounds(geojson.getBounds());
+        // Removes previous results from array so [0] is always the new result
+        if (myGeoJSON.length >= 1) {
+          myGeoJSON.shift();
+          nameSelected.shift();
+        }
       }
     },
     error: function(jqXHR, textStatus, errorThrown) {
@@ -164,3 +158,79 @@ $('#country-select').change(function() {
     }
   }); 
 });
+
+$('#country-select').change(function() {
+  $.ajax({
+    url: "libs/php/getCountryInfo.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+      // need to fix edge cases - use country code first then nest an another call using country name - hopefully cover all.
+      country: $('#country-select option:selected').text().replace(' ', '%20').replace('%20Rep.', '')
+    },
+    success: function(result) {
+      console.log(JSON.stringify(result));
+      if (result.status.name == "ok") {
+
+        const obj1 = result.data.currencies;
+        const obj2 = result.data.languages;
+
+        document.getElementById("infobox").innerHTML =
+          "<b>Country:</b> " + result.data.name.common + " <img src="+ result.data.flags.png +" width='16'  height='12'></img>" + "<br>" +
+          "<b>Currency:</b> " + obj1[Object.keys(obj1)[0]].name + " (" + obj1[Object.keys(obj1)[0]].symbol + ")<br>" +
+          "<b>Capital:</b> " + result.data.capital[0] + "<br>" +
+          "<b>Languages:</b> " + obj2[Object.keys(obj2)[0]] + (obj2[Object.keys(obj2)[1]] ? ", " + obj2[Object.keys(obj2)[1]] : '')  + "<br>" +
+          "<b>Area:</b> " + result.data.area + " km<sup>2</sup><br>" + 
+          "<b>Population:</b> " + result.data.population + " people <br>";
+
+
+
+
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      // your error code
+      console.log('error here')
+      console.log($('#country-select option:selected').text().replace(' ', '%20').replace('%20Rep.', ''));
+
+    }
+  }); 
+});
+
+function onMapClick(e) {
+  var popup = L.popup();
+  $.ajax({
+    url: "libs/php/findNearByWeather.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+      lat: e.latlng.lat,
+      lng: e.latlng.lng
+    },
+    success: function(result) {
+      const celcius = result['data']['main']['temp'] - 273.15;
+      //console.log(JSON.stringify(result));
+      if (result.status.name == "ok") {
+        //console.log('okayyyy weather')
+        //console.log(result['data'])
+        popup
+        .setLatLng(e.latlng)
+        .setContent(
+          "<b>Location:</b> " + result['data']['name'] + "<br>" +
+          "<b>Weather:</b> " + result['data']['weather'][0]['main'] + " - " + result['data']['weather'][0]['description'] + "<br>" +
+          "<b>Temperature:</b> " + celcius.toFixed(1) + " &#8451;<br>" +
+          "<b>Wind Speed:</b> " + result['data']['wind']['speed'].toFixed(1) + "mph" + "<br>" +
+          "<b>Gusts:</b> " + result['data']['wind']['gust'].toFixed(1) + "mph"
+        )
+        .openOn(map);
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      // your error code
+      console.log('error here')
+    }
+  }); 
+}
+
+map.on('click', onMapClick);
+
