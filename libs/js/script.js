@@ -158,6 +158,22 @@ $('#country-select').change(function() {
     }
   }); 
 });
+// $('document').ready(function() {
+//   $.ajax({
+//     type: 'GET',
+//     url: "libs/php/getCurrencyRates.php",
+//     dataType: "json",
+//     success: function(result){
+//       console.log("exchange working")
+//       if (result.status.name == "ok") {
+//         console.log("exchange status working")
+//       }
+//     },
+//     error: function(jqXHR, textStatus, errorThrown) {
+//       console.log('error on nested call'); 
+//     }
+//   })
+// }); 
 
 $('#country-select').change(function() {
   $.ajax({
@@ -169,31 +185,43 @@ $('#country-select').change(function() {
       country: $('#country-select option:selected').text().replace(' ', '%20').replace('%20Rep.', '')
     },
     success: function(result) {
-      console.log(JSON.stringify(result));
-      if (result.status.name == "ok") {
+      console.log('first call success')
+      $.ajax({
+        type: 'GET',
+        url: "libs/php/getCurrencyRates.php",
+        dataType: "json",
+        success: function(exchange){
+          if (exchange.status.name == "ok") {
+            console.log("exchange status working");
+            const aud = exchange.data.rates['AUD'].toFixed(2);
+            const eur = exchange.data.rates['EUR'].toFixed(2);
+            const gbp = exchange.data.rates['GBP'].toFixed(2);
+            const obj1 = result.data.currencies;
+            const obj2 = result.data.languages;
+  
+            document.getElementById("infobox").innerHTML =
+              "<b>Country:</b> " + result.data.name.common + " <img src="+ result.data.flags.png +" width='16'  height='12'></img>" + "<br>" +
+              "<b>Capital:</b> " + result.data.capital[0] + "<br>" +
+              "<b>Languages:</b> " + obj2[Object.keys(obj2)[0]] + (obj2[Object.keys(obj2)[1]] ? ", " + obj2[Object.keys(obj2)[1]] : '')  + "<br>" +
+              "<b>Area:</b> " + result.data.area + " km<sup>2</sup><br>" + 
+              "<b>Population:</b> " + result.data.population + " people <br>" +
+              "<b>Currency:</b> " + obj1[Object.keys(obj1)[0]].name + " (" + obj1[Object.keys(obj1)[0]].symbol + ")<br>" +
+              "<b>Exchange Rates (USD$): AUD </b>$" + aud + ", <b>EUR </b>&#X20AC;" + eur + ", <b>GBP </b>£" + gbp;
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log('error on nested call'); 
+        }
+      });    
+        if (result.status.name == "ok") {
 
-        const obj1 = result.data.currencies;
-        const obj2 = result.data.languages;
-
-        document.getElementById("infobox").innerHTML =
-          "<b>Country:</b> " + result.data.name.common + " <img src="+ result.data.flags.png +" width='16'  height='12'></img>" + "<br>" +
-          "<b>Currency:</b> " + obj1[Object.keys(obj1)[0]].name + " (" + obj1[Object.keys(obj1)[0]].symbol + ")<br>" +
-          "<b>Capital:</b> " + result.data.capital[0] + "<br>" +
-          "<b>Languages:</b> " + obj2[Object.keys(obj2)[0]] + (obj2[Object.keys(obj2)[1]] ? ", " + obj2[Object.keys(obj2)[1]] : '')  + "<br>" +
-          "<b>Area:</b> " + result.data.area + " km<sup>2</sup><br>" + 
-          "<b>Population:</b> " + result.data.population + " people <br>";
-
-
-
-
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        // your error code
+        console.log('error on nested call');
+        console.log($('#country-select option:selected').text().replace(' ', '%20').replace('%20Rep.', ''));
       }
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      // your error code
-      console.log('error here')
-      console.log($('#country-select option:selected').text().replace(' ', '%20').replace('%20Rep.', ''));
-
-    }
   }); 
 });
 
