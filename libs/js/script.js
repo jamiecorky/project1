@@ -107,8 +107,8 @@ $('document').ready(function() {
     dataType: 'json',
     success: function(result) {
       if (result.status.name == "ok") {
-        console.log(result.data[1].name)
-        for (let i = 0; i <= result.data.length; i++) {
+        // Adds countries from GeoJSON to select menu - fixes some naming errors also
+        for (let i = 0; i < result.data.length; i++) {
           if (result.data[i].iso_a3 !== '-99') {
             $('#country-select').append(`<option name="country" value=${result.data[i].iso_a3}>${result.data[i].name}</option>`);
           } else if (result.data[i].name == 'N. Cyprus') {
@@ -127,12 +127,14 @@ $('document').ready(function() {
   }); 
 });
 
-// Global array being pushed geoJSON bounds
+// Global variables
 let geojson;
 let myGeoJSON = [];
 let nameSelected = [];
 let countryInfo = [];
+let capitalMark = {};
 
+// Changes the boundary on the map to match the selected location
 $('#country-select').change(function() {
   const countryName = $('#country-select option:selected').text();
   const countryVal = $('#country-select option:selected').val();
@@ -148,7 +150,8 @@ $('#country-select').change(function() {
           myGeoJSON.push(result.returnBorder[0])
           nameSelected.push(result.returnName);
           if(geojson){
-            geojson.clearLayers()
+            geojson.clearLayers();
+            
           }
           geojson = L.geoJson(myGeoJSON, {
           style: style,
@@ -163,61 +166,77 @@ $('#country-select').change(function() {
       }
     },
     error: function(jqXHR, textStatus, errorThrown) {
-      console.log('error');
+      console.log('Ajax border error');
     }
   }); 
 });
 
+// Gets the country info to be diplayed when each country is selected
 $('#country-select').change(function() {
   $.ajax({
     url: "libs/php/getCountryInfo.php",
     type: 'POST',
     dataType: 'json',
     data: {
-      // need to fix edge cases - use country code first then nest an another call using country name - hopefully cover all.
       country: $('#country-select option:selected').val()
     },
     success: function(result) {
-      console.log('first call success')
+      console.log('Get Country Info Call Success')
+
+      // Nested to gain information about exchange rates from another - Updated Div with info from both APIS
       $.ajax({
         type: 'GET',
         url: "libs/php/getCurrencyRates.php",
         dataType: "json",
         success: function(exchange){
           if (exchange.status.name == "ok") {
-            console.log("exchange status working");
-            const aud = exchange.data.rates['AUD'].toFixed(2);
-            const eur = exchange.data.rates['EUR'].toFixed(2);
-            const gbp = exchange.data.rates['GBP'].toFixed(2);
-            const obj1 = result.data.currencies;
-            const obj2 = result.data.languages;
+            console.log("Exchange Call Success");
+            const currenciesObject = result.data.currencies;
+            const currencyOne = Object.keys(currenciesObject)[0];
+            const currencyTwo = Object.keys(currenciesObject)[1];
+            const currencyKey1 = currenciesObject[currencyOne];
+            const currencyKey2 = currenciesObject[currencyTwo];        
+            const mainC = exchange.data.rates[currencyOne].toFixed(2);
+            const secondC = exchange.data.rates[currencyTwo];
+            const Languages = result.data.languages;
   
             document.getElementById("infobox").innerHTML =
               "<b>Country:</b> " + result.data.name.common + " <img src="+ result.data.flags.png +" width='16'  height='12'></img>" + "<br>" +
-              "<b>Capital:</b> " + result.data.capital[0] + "<br>" +
-              "<b>Languages:</b> " + obj2[Object.keys(obj2)[0]] + (obj2[Object.keys(obj2)[1]] ? ", " + obj2[Object.keys(obj2)[1]] : '')  + "<br>" +
+              "<b>Capital:</b> " + ($('#country-select option:selected').text() == 'Somaliland' ? 'Hargeysa' : result.data.capital[0]) + "<br>" +
+              "<b>Languages:</b> " + Languages[Object.keys(Languages)[0]] + (Languages[Object.keys(Languages)[1]] ? ", " + Languages[Object.keys(Languages)[1]] : '') + "<br>" +
               "<b>Area:</b> " + result.data.area + " km<sup>2</sup><br>" + 
               "<b>Population:</b> " + result.data.population + " people <br>" +
-              "<b>Currency:</b> " + obj1[Object.keys(obj1)[0]].name + " (" + obj1[Object.keys(obj1)[0]].symbol + ")<br>" +
-              "<b>Exchange Rates (USD$): AUD </b>$" + aud + ", <b>EUR </b>&#X20AC;" + eur + ", <b>GBP </b>£" + gbp;
+              "<b>Main Currency:</b> " + currencyKey1.name + " (" + currencyKey1.symbol + ")<br>" +
+              "<b>Exchange Rates from $USD: " + currencyOne + "</b> " + currencyKey1.symbol + mainC + (currencyTwo ? ", <b>" + currencyTwo : "") + "</b>" + (secondC ? currencyKey2.symbol + secondC.toFixed(2) : '');
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-          console.log('error on nested call'); 
+          console.log('Error Currency In Rates Call'); 
         }
-      });    
+      });
+    
         if (result.status.name == "ok") {
+          capitalLat = result.data.capitalInfo.latlng[0];
+          capitalLon = result.data.capitalInfo.latlng[1];    
+          // If theres a capital marker already - Remove 
+          if (capitalMark != undefined) {
+            map.removeLayer(capitalMark)
+          };
+
+          // Adds selected country to map with marker and pop up text
+          capitalMark = L.marker([capitalLat, capitalLon]).addTo(map)
+          .bindPopup(`Welcome to ${result.data.capital}.<br> more information here.`)
+          .openPopup()          
 
         }
       },
       error: function(jqXHR, textStatus, errorThrown) {
-        // your error code
-        console.log('error on nested call');
-        console.log($('#country-select option:selected').val());
+        console.log('Error In Get Country Info Call');
       }
   }); 
 });
 
+// Weather API 
 function onMapClick(e) {
   var popup = L.popup();
   $.ajax({
@@ -249,6 +268,4 @@ function onMapClick(e) {
     }
   }); 
 }
-
 map.on('click', onMapClick);
-
