@@ -107,8 +107,17 @@ $('document').ready(function() {
     dataType: 'json',
     success: function(result) {
       if (result.status.name == "ok") {
+        console.log(result.data[1].name)
         for (let i = 0; i <= result.data.length; i++) {
-          $('#country-select').append(`<option name="country" value=${result.data[i].iso_a2}>${result.data[i].name}</option>`);
+          if (result.data[i].iso_a3 !== '-99') {
+            $('#country-select').append(`<option name="country" value=${result.data[i].iso_a3}>${result.data[i].name}</option>`);
+          } else if (result.data[i].name == 'N. Cyprus') {
+            $('#country-select').append(`<option name="country" value="CYP">${result.data[i].name}</option>`);
+          } else if (result.data[i].name == 'Kosovo') {
+            $('#country-select').append(`<option name="country" value="UNK">${result.data[i].name}</option>`);
+          } else {
+            $('#country-select').append(`<option name="country" value="MLI">${result.data[i].name}</option>`);
+          } 
         } 
       }
     },
@@ -158,22 +167,6 @@ $('#country-select').change(function() {
     }
   }); 
 });
-// $('document').ready(function() {
-//   $.ajax({
-//     type: 'GET',
-//     url: "libs/php/getCurrencyRates.php",
-//     dataType: "json",
-//     success: function(result){
-//       console.log("exchange working")
-//       if (result.status.name == "ok") {
-//         console.log("exchange status working")
-//       }
-//     },
-//     error: function(jqXHR, textStatus, errorThrown) {
-//       console.log('error on nested call'); 
-//     }
-//   })
-// }); 
 
 $('#country-select').change(function() {
   $.ajax({
@@ -182,7 +175,7 @@ $('#country-select').change(function() {
     dataType: 'json',
     data: {
       // need to fix edge cases - use country code first then nest an another call using country name - hopefully cover all.
-      country: $('#country-select option:selected').text().replace(' ', '%20').replace('%20Rep.', '')
+      country: $('#country-select option:selected').val()
     },
     success: function(result) {
       console.log('first call success')
@@ -220,7 +213,7 @@ $('#country-select').change(function() {
       error: function(jqXHR, textStatus, errorThrown) {
         // your error code
         console.log('error on nested call');
-        console.log($('#country-select option:selected').text().replace(' ', '%20').replace('%20Rep.', ''));
+        console.log($('#country-select option:selected').val());
       }
   }); 
 });
@@ -237,10 +230,7 @@ function onMapClick(e) {
     },
     success: function(result) {
       const celcius = result['data']['main']['temp'] - 273.15;
-      //console.log(JSON.stringify(result));
       if (result.status.name == "ok") {
-        //console.log('okayyyy weather')
-        //console.log(result['data'])
         popup
         .setLatLng(e.latlng)
         .setContent(
@@ -248,7 +238,7 @@ function onMapClick(e) {
           "<b>Weather:</b> " + result['data']['weather'][0]['main'] + " - " + result['data']['weather'][0]['description'] + "<br>" +
           "<b>Temperature:</b> " + celcius.toFixed(1) + " &#8451;<br>" +
           "<b>Wind Speed:</b> " + result['data']['wind']['speed'].toFixed(1) + "mph" + "<br>" +
-          "<b>Gusts:</b> " + result['data']['wind']['gust'].toFixed(1) + "mph"
+          (result['data']['wind']['gust'] ? "<b>Gusts:</b> " + result['data']['wind']['gust'].toFixed(1) + "mph" : '')
         )
         .openOn(map);
       }

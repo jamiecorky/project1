@@ -7,7 +7,11 @@
 
 	$executionStartTime = microtime(true);
 
-	$url='https://restcountries.com/v3.1/name/' . $_REQUEST['country'] . '?fullText=true';
+	$url='https://restcountries.com/v3.1/alpha/' . $_REQUEST['country'];
+
+  // Tried this to encode for the browser
+  // $inputUrl='https://restcountries.com/v3.1/name/' . $_REQUEST['country'] . '?fullText=true';
+  // $url = urlencode($inputUrl);
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
