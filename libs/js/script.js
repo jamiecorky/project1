@@ -6,20 +6,66 @@ $(window).on('load', function () {
   }
 });
 
+const youIcon = L.icon({
+  iconUrl: 'libs/img/you.png',
+  iconSize:     [60, 60], 
+  iconAnchor:   [30, 30], 
+  popupAnchor:  [0, -20] 
+});
+
+const capitalIcon = L.icon({
+  iconUrl: 'libs/img/capital.png',
+  iconSize:     [60, 60], 
+  iconAnchor:   [30, 30], 
+  popupAnchor:  [0, -20] 
+});
+
+const wikiIcon = L.icon({
+  iconUrl: 'libs/img/wiki.png',
+  iconSize:     [60, 60], 
+  iconAnchor:   [30, 30], 
+  popupAnchor:  [0, -20] 
+});
+
 const accessToken = 'cOYvUkIr2QTC1XUq4cllxAvdITUWUPMEJp9b84EhqypFuJabteMQtGFND8eBRj8n';
-const map = L.map('map');
+
+// Map tiles 
+const dark = L.tileLayer(
+  `https://tile.jawg.io/jawg-matrix/{z}/{x}/{y}.png?access-token=${accessToken}`, {
+    attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a> | <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">&copy; OSM contributors</a>',
+    maxZoom: 22
+  }
+)
+const streets = L.tileLayer(
+  `https://tile.jawg.io/jawg-streets/{z}/{x}/{y}{r}.png?access-token=${accessToken}`, {
+    attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a> | <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">&copy; OSM contributors</a>',
+    maxZoom: 22
+  }
+)
+
+const baseMaps = {
+  "Dark": dark,
+  "Streets": streets
+};
+
+
+
+const map = L.map('map', {layers: [streets, dark]});
+let mapControl = L.control.layers(baseMaps).addTo(map);
+
+
+L.control.attribution({prefix: 'icons from freepik'}).addTo(map);
 
 // Built in function for finding your location
-map.locate({setView: true, maxZoom: 8});
+map.locate({setView: true, maxZoom: 16});
 
-//var info = L.control();
 
-var legend = L.control({position: 'topright'});
 
+const legend = L.control({position: 'topright'});
         legend.onAdd = function (map) {
-
           var div = L.DomUtil.create('div', 'info legend');
           div.setAttribute('id', 'infobox');
+          
           div.innerHTML = "<b>Pick a country for more info</b>";
           return div;
         };
@@ -30,7 +76,7 @@ var legend = L.control({position: 'topright'});
 function onLocationFound(e) {
   var radius = e.accuracy;
 
-  L.marker(e.latlng).addTo(map)
+  L.marker(e.latlng, {icon: youIcon}).addTo(map)
       .bindPopup("Hey! Lets explore. Pick a country").openPopup();
 
   L.circle(e.latlng, radius).addTo(map);
@@ -43,15 +89,6 @@ function onLocationError(e) {
 map.on('locationerror', onLocationError);
 map.on('locationfound', onLocationFound);
 
-// Map tiles 
-L.tileLayer(
-  `https://tile.jawg.io/jawg-matrix/{z}/{x}/{y}.png?access-token=${accessToken}`, {
-    attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a> | <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">&copy; OSM contributors</a>',
-    maxZoom: 22
-  }
-).addTo(map);
-
-
 function style(feature) {
   return {
     weight: 2,
@@ -63,26 +100,26 @@ function style(feature) {
   };
 }
 
+
+
 function highlightFeature(e) {
-  var layer = e.target;
+  const layer = e.target;
 
   layer.setStyle({
     weight: 5,
     color: '#666',
     dashArray: '',
-    fillOpacity: 0.1
+    fillOpacity: 0
   });
 
   if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
     layer.bringToFront();
   }
-
- // info.update(layer.feature.properties);
 }
 
 function resetHighlight(e) {
   geojson.resetStyle(e.target);
- // info.update();
+
 }
 
 
@@ -97,7 +134,15 @@ function onEachFeature(feature, layer) {
     click: zoomToFeature,
     click: onMapClick,
   });  
-}  
+}
+
+function markerOnClick(e)
+{
+  var latLngs = [e.target.getLatLng()];
+  var markerBounds = L.latLngBounds(latLngs);
+  map.fitBounds(markerBounds);
+  map.setZoom(15);
+}
 
   // Ajax request to PHP to populate the nav select with countries
 $('document').ready(function() {
@@ -133,6 +178,8 @@ let myGeoJSON = [];
 let nameSelected = [];
 let countryInfo = [];
 let capitalMark = {};
+let wikiGroup;
+console.log(wikiGroup)
 
 // Changes the boundary on the map to match the selected location
 $('#country-select').change(function() {
@@ -151,7 +198,6 @@ $('#country-select').change(function() {
           nameSelected.push(result.returnName);
           if(geojson){
             geojson.clearLayers();
-            
           }
           geojson = L.geoJson(myGeoJSON, {
           style: style,
@@ -182,6 +228,8 @@ $('#country-select').change(function() {
     },
     success: function(result) {
       console.log('Get Country Info Call Success')
+      let capitalLat = result.data.capitalInfo.latlng[0];
+      let capitalLon = result.data.capitalInfo.latlng[1]; 
 
       // Nested to gain information about exchange rates from another - Updated Div with info from both APIS
       $.ajax({
@@ -199,6 +247,7 @@ $('#country-select').change(function() {
             const mainC = exchange.data.rates[currencyOne].toFixed(2);
             const secondC = exchange.data.rates[currencyTwo];
             const Languages = result.data.languages;
+
   
             document.getElementById("infobox").innerHTML =
               "<b>Country:</b> " + result.data.name.common + " <img src="+ result.data.flags.png +" width='16'  height='12'></img>" + "<br>" +
@@ -207,32 +256,67 @@ $('#country-select').change(function() {
               "<b>Area:</b> " + result.data.area + " km<sup>2</sup><br>" + 
               "<b>Population:</b> " + result.data.population + " people <br>" +
               "<b>Main Currency:</b> " + currencyKey1.name + " (" + currencyKey1.symbol + ")<br>" +
-              "<b>Exchange Rates from $USD: " + currencyOne + "</b> " + currencyKey1.symbol + mainC + (currencyTwo ? ", <b>" + currencyTwo : "") + "</b>" + (secondC ? currencyKey2.symbol + secondC.toFixed(2) : '');
+              "<b>Exchange Rates from $USD: " + currencyOne + "</b> " + currencyKey1.symbol + mainC + (currencyTwo ? ", <b>" + currencyTwo : "") + " </b>" + (secondC ? currencyKey2.symbol + secondC.toFixed(2) : '');
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
           console.log('Error Currency In Rates Call'); 
         }
       });
+      // Get wiki info to place as markers on map
+      $.ajax({
+        url: "libs/php/getWikiInfo.php",
+        type: 'POST',
+        dataType: 'json',
+        data: {
+          lat: capitalLat,
+          lng: capitalLon
+        },
+        success: function(result) {
+          if (result.status.name == "ok") {
+            //console.log(result.data);
+            console.log(wikiGroup);
+            if(wikiGroup !== undefined) {
+              wikiGroup.clearLayers();
+              map.removeLayer(wikiGroup)
+            }
     
-        if (result.status.name == "ok") {
-          capitalLat = result.data.capitalInfo.latlng[0];
-          capitalLon = result.data.capitalInfo.latlng[1];    
-          // If theres a capital marker already - Remove 
-          if (capitalMark != undefined) {
-            map.removeLayer(capitalMark)
-          };
+            wikiGroup = L.layerGroup().addTo(map);
+            map.on('click', onMapClick);            
 
-          // Adds selected country to map with marker and pop up text
-          capitalMark = L.marker([capitalLat, capitalLon]).addTo(map)
-          .bindPopup(`Welcome to ${result.data.capital}.<br> more information here.`)
-          .openPopup()          
-
+            for (let i = 0; i < result.data.length; i++) {
+              L.marker([result.data[i].lat, result.data[i].lng], {icon: wikiIcon}).addTo(wikiGroup)
+              .on('click', markerOnClick)
+              .addTo(map)
+              .bindPopup("<b>" + result.data[i].title + "</b><br>" + result.data[i].summary + " <a href='https://" + result.data[i].wikipediaUrl + "' target='blank'>Read more...</a>")
+            }
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log('error here')
         }
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        console.log('Error In Get Country Info Call');
+      }); 
+
+      if (result.status.name == "ok") {
+        capitalLat = result.data.capitalInfo.latlng[0];
+        capitalLon = result.data.capitalInfo.latlng[1]; 
+
+        // If theres a capital marker already - Remove 
+        if (capitalMark != undefined) {
+          map.removeLayer(capitalMark)
+        };
+
+        // Adds selected country to map with marker and pop up text
+        capitalMark = L.marker([capitalLat, capitalLon], {icon: capitalIcon})
+        .on('click', markerOnClick)
+        .addTo(map)
+        .bindPopup(`Welcome to ${result.data.capital}`)
+        .openPopup()
       }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log('Error In Get Country Info Call');
+    }  
   }); 
 });
 
@@ -268,4 +352,15 @@ function onMapClick(e) {
     }
   }); 
 }
-map.on('click', onMapClick);
+
+// Styles
+$('#infobox').css({'background-color': '#fff', 'opacity': '1'});
+
+$(window).resize(function(){	
+	if ($("#navpin").css("margin-right") == "0px" ){
+		$('.leaflet-control-layers').css({'top': '95px'});
+	} else {
+		$('.leaflet-control-layers').css({'top': '58px'});
+
+  }
+})

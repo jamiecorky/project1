@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
   <style>
-    
+
 .leaflet-container {
 	height: 400px;
 	width: 600px;
@@ -18,17 +18,14 @@ div.info.leaflet-control {
 	margin-top: 66px;
 }
 
-#infobox {
-	background-color: #fff;
-	opacity: 1;
-}
-
 .info {
 	padding: 6px 8px;
   font: 14px/16px Arial, Helvetica, sans-serif;
 	background: rgba(255, 255, 255, 0.6);
 	box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 	border-radius: 5px;
+  opacity: 1;
+  line-height: 18px;
 }
 
 .info h4 {
@@ -72,6 +69,7 @@ div.info.leaflet-control {
   </nav>
 
   <div id="map"></div>
+  <div id="layermap"></div>
   <script src="libs/js/jquery-2.2.3.min.js"></script>
   <script src="libs/js/script.js"></script>
   <script src="libs/js/bootstrap.bundle.min.js"></script>
