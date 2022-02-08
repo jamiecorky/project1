@@ -61,7 +61,7 @@ map.locate({setView: true, maxZoom: 16});
 
 
 
-const legend = L.control({position: 'topright'});
+const legend = L.control({position: 'bottomright'});
         legend.onAdd = function (map) {
           var div = L.DomUtil.create('div', 'info legend');
           div.setAttribute('id', 'infobox');
@@ -179,12 +179,12 @@ let nameSelected = [];
 let countryInfo = [];
 let capitalMark = {};
 let wikiGroup;
-console.log(wikiGroup)
 
 // Changes the boundary on the map to match the selected location
 $('#country-select').change(function() {
   const countryName = $('#country-select option:selected').text();
   const countryVal = $('#country-select option:selected').val();
+
   $.ajax({
     url: "libs/php/getCountryBorders.php",
     type: 'POST',
@@ -274,13 +274,11 @@ $('#country-select').change(function() {
         },
         success: function(result) {
           if (result.status.name == "ok") {
-            //console.log(result.data);
-            console.log(wikiGroup);
             if(wikiGroup !== undefined) {
               wikiGroup.clearLayers();
               map.removeLayer(wikiGroup)
             }
-    
+
             wikiGroup = L.layerGroup().addTo(map);
             map.on('click', onMapClick);            
 
@@ -353,14 +351,36 @@ function onMapClick(e) {
   }); 
 }
 
+
+
 // Styles
-$('#infobox').css({'background-color': '#fff', 'opacity': '1'});
+$(document).ready(function(){
+  const win = $(window);
+  if (win.width() <= 575) {
+    $('.leaflet-control').css({'top': '95px'});
+    $('#infobox').css({'background-color': '#fff', 'padding' :'5px', 'opacity': '1', 'font': '12px/16px Arial, Helvetica, sans-serif', 'margin-bottom': '5px', 'top': '0', 'border-radius': '5px', 'box-shadow': '0 0 15px rgba(0, 0, 0, 0.3)'});
+    $('.legend').css({'color': '#212529', 'text-align' :'left'});
+    $('.leaflet-control-attribution').css({'top': '0', 'text-align' :'left'});
+    
 
-$(window).resize(function(){	
-	if ($("#navpin").css("margin-right") == "0px" ){
-		$('.leaflet-control-layers').css({'top': '95px'});
-	} else {
-		$('.leaflet-control-layers').css({'top': '58px'});
-
+  } else {
+    $('.leaflet-control').css({'top': '55px'});
+    $('#infobox').css({'background-color': '#fff', 'padding' :'6px', 'font': '14px/18px Arial, Helvetica, sans-serif', 'box-shadow': '0 0 15px rgba(0, 0, 0, 0.3)', 'border-radius': '5px', 'opacity': '1', 'margin-bottom': '10px', 'top': '0'});
+    $('.legend').css({'color': '#212529', 'text-align' :'left'});
+    $('.leaflet-control-attribution').css({'top': '0', 'text-align' :'left'});
   }
 })
+
+$(window).on('resize', function(){
+  const win = $(this); //this = window
+  if (win.width() <= 575) {
+    $('.leaflet-control').css({'top': '95px'});
+    $('#infobox').css({'padding' :'5px', 'margin-bottom': '5px', 'font': '12px/16px Arial, Helvetica, sans-serif', 'top': '0'});
+    $('.leaflet-control-attribution').css({'top': '0', 'text-align' :'left'});
+  }
+  if (win.width() > 575 ) { 
+    $('.leaflet-control').css({'top': '55px'});
+    $('#infobox').css({'padding' :'6px', 'font': '14px/18px Arial, Helvetica, sans-serif', 'margin-bottom': '10px', 'top': '0'});
+    $('.leaflet-control-attribution').css({'top': '0', 'text-align' :'left'});
+  }
+});
