@@ -5,7 +5,7 @@
 
 	$executionStartTime = microtime(true);
 
-  $url='https://openexchangerates.org/api/latest.json?app_id=f5bfcb796811401191b03575327eea35';
+	$url='http://api.geonames.org/citiesJSON?north=' . $_REQUEST['north'] . '&south=' . $_REQUEST['south'] . '&east=' . $_REQUEST['east'] . '&west=' . $_REQUEST['west'] . '&username=jamiecorky&style=full';
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -22,7 +22,7 @@
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-	$output['data'] = $decode;
+	$output['data'] = $decode['geonames'];
 	
 	header('Content-Type: application/json; charset=UTF-8');
 
