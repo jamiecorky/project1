@@ -20,6 +20,13 @@ const capitalIcon = L.icon({
   popupAnchor:  [0, -20] 
 });
 
+const cityIcon = L.icon({
+  iconUrl: 'libs/img/city.png',
+  iconSize:     [60, 60], 
+  iconAnchor:   [30, 60], 
+  popupAnchor:  [0, -20] 
+});
+
 const wikiIcon = L.icon({
   iconUrl: 'libs/img/wiki.png',
   iconSize:     [60, 60], 
@@ -51,7 +58,17 @@ const baseMaps = {
 let yourLat = [];
 let yourLng = [];
 
-const map = L.map('map', {layers: [streets, dark]});
+const corner1 = L.latLng(-90, -200)
+const corner2 = L.latLng(90, 200)
+const bounds = L.latLngBounds(corner1, corner2)
+
+const map = L.map('map', {
+  layers: [streets, dark],
+  minZoom: 2,
+  maxBoundsViscosity: 1,
+  maxBounds: bounds
+});
+
 let mapControl = L.control.layers(baseMaps).addTo(map);
 
 L.control.attribution({prefix: 'icons from freepik'}).addTo(map);
@@ -103,22 +120,7 @@ function onLocationFound(e) {
       console.log('your lat lng error');
     }
   }); 
-
-
 }
-
-// L.easyButton( 'fa-wikipedia-w', function(){
-//   map.setView([38, 139], 4);
-// }).addTo(map);
-
-// L.easyButton( 'fa-map-pin', function(){
-//   map.setView([37.8, -96], 3);
-// }).addTo(map);
-
-
-
-
-
 
 function onLocationError(e) {
   alert(e.message);
@@ -194,7 +196,7 @@ $('document').ready(function() {
           } else if (result.data[i].name == 'N. Cyprus') {
             $('#country-select').append(`<option name="country" value="CY">${result.data[i].name}</option>`);
           } else if (result.data[i].name == 'Kosovo') {
-            $('#country-select').append(`<option name="country" value="UNK">${result.data[i].name}</option>`); // may need to double check this, issue with 2 digit code
+            $('#country-select').append(`<option name="country" value="XK">${result.data[i].name}</option>`); // may need to double check this, issue with 2 digit code
           } else {
             $('#country-select').append(`<option name="country" value="ML">${result.data[i].name}</option>`);
           } 
@@ -221,6 +223,7 @@ function removeCities() {
   if(cityGroup !== undefined) {
     cityGroup.clearLayers();
     map.removeLayer(cityGroup)
+    mapControl.removeLayer(cityGroup)
   }
 }
 
@@ -235,7 +238,7 @@ const citytoggle = L.easyButton({
     title: 'remove markers',
     stateName: 'remove-markers',
     onClick: function(control) {
-      map.removeLayer(cityGroup)
+
       control.state('add-markers');
     }
   },
@@ -244,12 +247,11 @@ const citytoggle = L.easyButton({
     icon: 'fa-map-marker',
     title: 'add city markers',
     onClick: function(control) {
-      map.addLayer(cityGroup)
+
       control.state('remove-markers');
     }
   }]
 });
-citytoggle.addTo(map);
 
 // Changes the boundary on the map to match the selected location
 $('#country-select').change(function() {
@@ -314,11 +316,13 @@ $('#country-select').change(function() {
               if(wikiGroup !== undefined) {
                 wikiGroup.clearLayers();
                 map.removeLayer(wikiGroup)
+                mapControl.removeLayer(wikiGroup)
               }
 
               wikiGroup = L.layerGroup().addTo(map);
-              map.on('click', onMapClick);            
-
+              
+              mapControl.addOverlay(wikiGroup, "Wiki Pins");  
+              map.on('click', onMapClick);
               for (let i = 0; i < result.data.length; i++) {
                 L.marker([result.data[i].lat, result.data[i].lng], {icon: wikiIcon}).addTo(wikiGroup)
                 .on('click', markerOnClick)
@@ -347,7 +351,7 @@ $('#country-select').change(function() {
             if (cities.status.name == "ok") {
               removeCities();
               addCities();
-                          
+              mapControl.addOverlay(cityGroup, "Cities");   
 
               for (let i = 0; i < cities.data.length; i++) {
                 if(cities.data[i].countrycode == $('#country-select').val()) {
@@ -357,6 +361,7 @@ $('#country-select').change(function() {
                   .bindPopup("<b>Welcome to " + cities.data[i].name + "</b><br>Population: " + cities.data[i].population + " <a href='https://" + cities.data[i].wikipedia + "' target='blank'>Read more...</a>")
                 }
               }              
+            
             }
           },
           error: function(jqXHR, textStatus, errorThrown) {
@@ -417,8 +422,6 @@ $('#country-select').change(function() {
         }
       });
 
-
-
       if (result.status.name == "ok") {
         capitalLat = result.data.capitalInfo.latlng[0];
         capitalLon = result.data.capitalInfo.latlng[1]; 
@@ -441,8 +444,6 @@ $('#country-select').change(function() {
     }  
   }); 
 });
-
-
 
 // Weather API 
 function onMapClick(e) {
@@ -508,4 +509,3 @@ $(window).on('resize', function(){
     $('.leaflet-control-attribution').css({'top': '0', 'text-align' :'left'});
   }
 });
-
