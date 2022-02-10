@@ -222,14 +222,12 @@ let wikiGroup;
 function removeCities() {
   if(cityGroup !== undefined) {
     cityGroup.clearLayers();
-    map.removeLayer(cityGroup)
     mapControl.removeLayer(cityGroup)
   }
 }
 
 function addCities() {
-  cityGroup = L.layerGroup().addTo(map);
-  map.on('click', onMapClick);
+  cityGroup = L.markerClusterGroup();
 }
 
 
@@ -298,28 +296,24 @@ $('#country-select').change(function() {
           },
           success: function(result) {
             if (result.status.name == "ok") {
-              if(wikiGroup !== undefined) {
-                
+              if(wikiGroup) {
                 wikiGroup.clearLayers();
-                map.removeLayer(wikiGroup)
                 mapControl.removeLayer(wikiGroup)
-                wikiGroup.refreshClusters();
-                wikiGroup.checkOut()
               }
 
-              wikiGroup = L.markerClusterGroup.layerSupport().addTo(map);
+              wikiGroup = L.markerClusterGroup();
 
               
               mapControl.addOverlay(wikiGroup, "Wiki Pins");  
-              map.on('click', onMapClick);
+
+              let markers = [];
               for (let i = 0; i < result.data.length; i++) {
-                L.marker([result.data[i].lat, result.data[i].lng], {icon: wikiIcon}).addTo(wikiGroup)
-                .on('click', markerOnClick)
-                .addTo(map)
-                .bindPopup("<b>" + result.data[i].title + "</b><br>" + result.data[i].summary + " <a href='https://" + result.data[i].wikipediaUrl + "' target='blank'>Read more...</a>")
+                markers.push(L.marker([result.data[i].lat, result.data[i].lng], {icon: wikiIcon}).on('click', markerOnClick)
+                .bindPopup("<b>" + result.data[i].title + "</b><br>" + result.data[i].summary + " <a href='https://" + result.data[i].wikipediaUrl + "' target='blank'>Read more...</a>"));
               }
-              wikiGroup.checkin();
-              wikiGroup.refreshClusters();
+
+              wikiGroup.addLayers(markers);
+              map.addLayer(wikiGroup);
             }
           },
           error: function(jqXHR, textStatus, errorThrown) {
@@ -344,14 +338,16 @@ $('#country-select').change(function() {
               addCities();
               mapControl.addOverlay(cityGroup, "Cities");   
 
+              let markers = []
               for (let i = 0; i < cities.data.length; i++) {
                 if(cities.data[i].countrycode == $('#country-select').val()) {
-                  L.marker([cities.data[i].lat, cities.data[i].lng], {icon: capitalIcon}).addTo(cityGroup)
-                  .on('click', markerOnClick)
-                  .addTo(map)
-                  .bindPopup("<b>Welcome to " + cities.data[i].name + "</b><br>Population: " + cities.data[i].population + " <a href='https://" + cities.data[i].wikipedia + "' target='blank'>Read more...</a>")
+                  markers.push(L.marker([cities.data[i].lat, cities.data[i].lng], {icon: capitalIcon}).on('click', markerOnClick)
+                  .bindPopup("<b>Welcome to " + cities.data[i].name + "</b><br>Population: " + cities.data[i].population + " <a href='https://" + cities.data[i].wikipedia + "' target='blank'>Read more...</a>"));
                 }
-              }              
+              } 
+              
+              cityGroup.addLayers(markers);
+              map.addLayer(cityGroup)
             
             }
           },
