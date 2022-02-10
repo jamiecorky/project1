@@ -76,16 +76,6 @@ L.control.attribution({prefix: 'icons from freepik'}).addTo(map);
 // Built in function for finding your location
 map.locate({setView: true, maxZoom: 16});
 
-const legend = L.control({position: 'bottomright'});
-
-legend.onAdd = function (map) {
-  var div = L.DomUtil.create('div', 'info legend');
-  div.setAttribute('id', 'infobox');
-  div.innerHTML = "<b>Pick a country for more info</b>";
-  return div;
-};
-legend.addTo(map);
-
 // Function for when you are found on map to display pop up
 function onLocationFound(e) {
   var radius = e.accuracy;
@@ -100,7 +90,7 @@ function onLocationFound(e) {
   L.easyButton( 'fa-location-arrow', function(){
     map.setView(e.latlng)
     .setZoom(12)
-  }).addTo(map);
+  }, {position: 'topright'}).addTo(map);
 
   // Updates select menu with current country
   $.ajax({
