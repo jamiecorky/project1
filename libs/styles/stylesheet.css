@@ -17,6 +17,15 @@ body,
 	top: 55px;
 }
 
+.modal-dialog {
+	position: fixed;
+	top: auto;
+	left: auto;
+	right: auto;
+	margin: 10px;
+	bottom: 0;
+}
+
 #preloader {
 	position: fixed;
 	top: 0;
@@ -70,5 +79,9 @@ body,
 
 	.leaflet-control-zoom {
 		top: 95px;
+	}
+
+	.modal-dialog {
+		margin: 5px;
 	}
 }

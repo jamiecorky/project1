@@ -182,7 +182,6 @@ function markerOnClick(e)
 }
   // Ajax request to PHP to populate the nav select with countries
 $('document').ready(function() {
-
   $.ajax({
     url: "libs/php/getGeoJson.php",
     type: 'GET',
@@ -232,26 +231,29 @@ function addCities() {
   map.on('click', onMapClick);
 }
 
-const citytoggle = L.easyButton({
-  states: [{
-    icon: 'fa-undo',
-    title: 'remove markers',
-    stateName: 'remove-markers',
-    onClick: function(control) {
+// const citytoggle = L.easyButton({
+//   states: [{
+//     icon: 'fa-undo',
+//     title: 'remove markers',
+//     stateName: 'remove-markers',
+//     onClick: function(control) {
 
-      control.state('add-markers');
-    }
-  },
-  {
-    stateName: 'add-markers',
-    icon: 'fa-map-marker',
-    title: 'add city markers',
-    onClick: function(control) {
+//       control.state('add-markers');
+//     }
+//   },
+//   {
+//     stateName: 'add-markers',
+//     icon: 'fa-map-marker',
+//     title: 'add city markers',
+//     onClick: function(control) {
 
-      control.state('remove-markers');
-    }
-  }]
-});
+//       control.state('remove-markers');
+//     }
+//   }]
+// });
+
+const infoButton = L.easyButton('fa-info-circle', function(btn, map){
+  $('#countryModal').modal('show');}).addTo(map);
 
 // Changes the boundary on the map to match the selected location
 $('#country-select').change(function() {
@@ -407,7 +409,7 @@ $('#country-select').change(function() {
             const Languages = result.data.languages;
 
   
-            document.getElementById("infobox").innerHTML =
+            document.getElementById("country-modal-body").innerHTML =
               "<b>Country:</b> " + result.data.name.common + " <img src="+ result.data.flags.png +" width='16'  height='12'></img>" + "<br>" +
               "<b>Capital:</b> " + ($('#country-select option:selected').text() == 'Somaliland' ? 'Hargeysa' : result.data.capital[0]) + "<br>" +
               "<b>Languages:</b> " + Languages[Object.keys(Languages)[0]] + (Languages[Object.keys(Languages)[1]] ? ", " + Languages[Object.keys(Languages)[1]] : '') + "<br>" +
