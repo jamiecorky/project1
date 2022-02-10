@@ -400,20 +400,21 @@ $('#country-select').change(function() {
       });
 
       if (result.status.name == "ok") {
-        capitalLat = result.data.capitalInfo.latlng[0];
-        capitalLon = result.data.capitalInfo.latlng[1]; 
+        console.log(result.data)
+        // capitalLat = result.data.capitalInfo.latlng[0];
+        // capitalLon = result.data.capitalInfo.latlng[1]; 
 
-        // If theres a capital marker already - Remove 
-        if (capitalMark != undefined) {
-          map.removeLayer(capitalMark)
-        };
+        // // If theres a capital marker already - Remove 
+        // if (capitalMark != undefined) {
+        //   map.removeLayer(capitalMark)
+        // };
 
-        // Adds selected country to map with marker and pop up text
-        capitalMark = L.marker([capitalLat, capitalLon], {icon: capitalIcon})
-        .on('click', markerOnClick)
-        .addTo(map)
-        .bindPopup(`<b>Welcome to ${result.data.capital}</b><br> Click here to see more`)
-        .openPopup()
+        // // Adds selected country to map with marker and pop up text
+        // capitalMark = L.marker([capitalLat, capitalLon], {icon: capitalIcon})
+        // .on('click', markerOnClick)
+        // .addTo(map)
+        // .bindPopup(`<b>Welcome to ${result.data.capital}</b><br> Click here to see more`)
+        // .openPopup()
       }
     },
     error: function(jqXHR, textStatus, errorThrown) {

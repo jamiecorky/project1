@@ -5,7 +5,7 @@
 
 	$executionStartTime = microtime(true);
 
-	$url='http://api.geonames.org/wikipediaBoundingBoxJSON?formatted=true&maxRows=40&north=' . $_REQUEST['north'] . '&south=' . $_REQUEST['south'] . '&east=' . $_REQUEST['east'] . '&west=' . $_REQUEST['west'] . '&username=jamiecorky&style=full';
+	$url='http://api.geonames.org/wikipediaBoundingBoxJSON?formatted=true&maxRows=100&north=' . $_REQUEST['north'] . '&south=' . $_REQUEST['south'] . '&east=' . $_REQUEST['east'] . '&west=' . $_REQUEST['west'] . '&username=jamiecorky&style=full';
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
