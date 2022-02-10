@@ -208,6 +208,7 @@ $('document').ready(function() {
   });
 });
 
+
 // Global variables
 let geojson;
 let myGeoJSON = [];
@@ -231,26 +232,8 @@ function addCities() {
   map.on('click', onMapClick);
 }
 
-// const citytoggle = L.easyButton({
-//   states: [{
-//     icon: 'fa-undo',
-//     title: 'remove markers',
-//     stateName: 'remove-markers',
-//     onClick: function(control) {
 
-//       control.state('add-markers');
-//     }
-//   },
-//   {
-//     stateName: 'add-markers',
-//     icon: 'fa-map-marker',
-//     title: 'add city markers',
-//     onClick: function(control) {
 
-//       control.state('remove-markers');
-//     }
-//   }]
-// });
 
 const infoButton = L.easyButton('fa-info-circle', function(btn, map){
   $('#countryModal').modal('show');}).addTo(map);
@@ -321,7 +304,8 @@ $('#country-select').change(function() {
                 mapControl.removeLayer(wikiGroup)
               }
 
-              wikiGroup = L.layerGroup().addTo(map);
+              wikiGroup = L.markerClusterGroup().addTo(map);
+
               
               mapControl.addOverlay(wikiGroup, "Wiki Pins");  
               map.on('click', onMapClick);
