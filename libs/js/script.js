@@ -299,12 +299,15 @@ $('#country-select').change(function() {
           success: function(result) {
             if (result.status.name == "ok") {
               if(wikiGroup !== undefined) {
+                
                 wikiGroup.clearLayers();
                 map.removeLayer(wikiGroup)
                 mapControl.removeLayer(wikiGroup)
+                wikiGroup.refreshClusters();
+                wikiGroup.checkOut()
               }
 
-              wikiGroup = L.markerClusterGroup().addTo(map);
+              wikiGroup = L.markerClusterGroup.layerSupport().addTo(map);
 
               
               mapControl.addOverlay(wikiGroup, "Wiki Pins");  
@@ -315,6 +318,8 @@ $('#country-select').change(function() {
                 .addTo(map)
                 .bindPopup("<b>" + result.data[i].title + "</b><br>" + result.data[i].summary + " <a href='https://" + result.data[i].wikipediaUrl + "' target='blank'>Read more...</a>")
               }
+              wikiGroup.checkin();
+              wikiGroup.refreshClusters();
             }
           },
           error: function(jqXHR, textStatus, errorThrown) {
