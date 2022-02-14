@@ -20,12 +20,12 @@ const capitalIcon = L.icon({
   popupAnchor:  [0, -20] 
 });
 
-const cityIcon = L.icon({
-  iconUrl: 'libs/img/city.png',
-  iconSize:     [60, 60], 
-  iconAnchor:   [30, 60], 
-  popupAnchor:  [0, -20] 
-});
+// const cityIcon = L.icon({
+//   iconUrl: 'libs/img/city.png',
+//   iconSize:     [60, 60], 
+//   iconAnchor:   [30, 60], 
+//   popupAnchor:  [0, -20] 
+// });
 
 const wikiIcon = L.icon({
   iconUrl: 'libs/img/wiki.png',
@@ -44,11 +44,15 @@ const dark = L.tileLayer(
   }
 )
 const streets = L.tileLayer(
-  `https://tile.jawg.io/jawg-streets/{z}/{x}/{y}{r}.png?access-token=${accessToken}`, {
-    attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a> | <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">&copy; OSM contributors</a>',
-    maxZoom: 22
+  'https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=vT8D4gm5ejB3f5qXd1Ap', {
+    tileSize: 512,
+    zoomOffset: -1,
+    minZoom: 1,
+    attribution: "\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
+    crossOrigin: true
   }
 )
+
 
 const baseMaps = {
   "Dark": dark,
