@@ -78,38 +78,8 @@ map.locate({setView: true, maxZoom: 16});
 
 // Function for when you are found on map to display pop up
 function onLocationFound(e) {
-  // var radius = e.accuracy;
-  // L.marker(e.latlng, {icon: youIcon}).addTo(map)
-  // .bindPopup("Hey! Lets explore. Pick a country").openPopup();
-
-  // L.circle(e.latlng, radius).addTo(map);
-
   yourLat.push(e.latlng.lat);
   yourLng.push(e.latlng.lng);
-
-  // L.easyButton( 'fa-location-arrow', function(){
-  //   map.setView(e.latlng)
-  //   .setZoom(12)
-  // }, {position: 'topright'}).addTo(map);
-
-  // Updates select menu with current country
-  $.ajax({
-    url: "libs/php/getCurrentCountryCode.php",
-    type: 'POST',
-    dataType: 'json',
-    data: { lat: e.latlng.lat, 
-            lng: e.latlng.lng
-          },
-    success: function(result) {
-      if (result.status.name == "ok") {
-        //console.log(result.data.countryCode)
-        $("#country-select").val(result.data.countryCode).change();
-      }
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      console.log('your lat lng error');
-    }
-  }); 
 }
 
 function onLocationError(e) {
@@ -170,8 +140,38 @@ function markerOnClick(e)
   map.fitBounds(markerBounds);
   map.setZoom(15);
 }
-  // Ajax request to PHP to populate the nav select with countries
+
+const userPosition = { lat: '', lon: '' }
+  if(navigator.geolocation)
+    {
+      navigator.geolocation.getCurrentPosition(function(position){
+        userPosition.lat = position.coords.latitude;
+        userPosition.lon = position.coords.longitude;
+      });
+    } else {
+      alert("Geolocation not supported by your browser");
+    }
+
+ 
 $('document').ready(function() {
+  // Ajax request to PHP to populate the nav select with countries
+  $.ajax({
+    url: "libs/php/getCurrentCountryCode.php",
+    type: 'POST',
+    dataType: 'json',
+    data: { lat: userPosition.lat, 
+            lng: userPosition.lon
+          },
+    success: function(result) {
+      if (result.status.name == "ok") {
+        $("#country-select").val(result.data.countryCode).change();
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log('your lat lng error');
+    }
+  }); 
+
   $.ajax({
     url: "libs/php/getGeoJson.php",
     type: 'GET',
