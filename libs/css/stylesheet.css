@@ -21,6 +21,27 @@ body,
 	align-items: flex-end;
 }
 
+.align-td-r {
+	text-align: right;
+}
+
+.align-td-l {
+	text-align: left;
+}
+
+table {
+	text-align: center;
+}
+
+#weather-key {
+	font-weight: bold;
+	font-size: 00.75em;
+}
+
+.country-flag {
+	margin-right: 10px;
+}
+
 #preloader {
 	position: fixed;
 	top: 0;
