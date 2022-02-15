@@ -354,11 +354,11 @@ $('#country-select').change(function() {
     success: function(cams) {
       if (cams.status.name == "ok") {
         camsData = cams.data.result.webcams;
-
           if(camGroup) {
             camGroup.clearLayers();
             mapControl.removeLayer(camGroup)
           }
+          
           camGroup = L.markerClusterGroup();
           mapControl.addOverlay(camGroup, "Webcams");  
 
@@ -370,8 +370,6 @@ $('#country-select').change(function() {
 
           camGroup.addLayers(markers);
           map.addLayer(camGroup);
-        
-        console.log(cams)
       }
     },
     error: function(jqXHR, textStatus, errorThrown) {
@@ -481,7 +479,6 @@ $('#country-select').change(function() {
               
               cityGroup.addLayers(markers);
               map.addLayer(cityGroup)
-            
             }
           },
           error: function(jqXHR, textStatus, errorThrown) {
@@ -504,7 +501,6 @@ $('#country-select').change(function() {
       country: $('#country-select option:selected').val()
     },
     success: function(result) {
-      // console.log(result)
       console.log('Get Country Info Call Success')
       let capitalLat = result.data.capitalInfo.latlng[0];
       let capitalLon = result.data.capitalInfo.latlng[1];
@@ -569,14 +565,9 @@ $('#country-select').change(function() {
             $("#weather-location").html(result.data.capital + " 7 Day Weather Forecast");
             $("#weather-key").html("<td>Day</td><td>Weather</td><td>Min/Max</td><td>Wind</td></b>")
             $("#weather-0").html("<td>Today" + Date.parse("t").toString(', d MMM') + "</td><td>" + dWeather[0].weather[0].main + ", " + dWeather[0].weather[0].description + "</td><td>" + ((dWeather[0].temp.min-32)/1.8).toFixed(0) + "&#8451;/" + ((dWeather[0].temp.max-32)/1.8).toFixed(0) + "&#8451;</td><td>" + dWeather[0].wind_speed.toFixed(0) + "mph</td>")
-            $("#weather-1").html("<td>" + Date.parse("t + 1d").toString('dddd, d MMM') + "</td><td>" + dWeather[1].weather[0].main + ", " + dWeather[1].weather[0].description + "</td><td>" + ((dWeather[1].temp.min-32)/1.8).toFixed(0) + "&#8451;/" + ((dWeather[1].temp.max-32)/1.8).toFixed(0) + "&#8451;</td><td>" + dWeather[1].wind_speed.toFixed(0) + "mph</td>")
-            $("#weather-2").html("<td>" + Date.parse("t + 2d").toString('dddd, d MMM') + "</td><td>" + dWeather[2].weather[0].main + ", " + dWeather[2].weather[0].description + "</td><td>" + ((dWeather[2].temp.min-32)/1.8).toFixed(0) + "&#8451;/" + ((dWeather[2].temp.max-32)/1.8).toFixed(0) + "&#8451;</td><td>" + dWeather[2].wind_speed.toFixed(0) + "mph</td>")
-            $("#weather-3").html("<td>" + Date.parse("t + 3d").toString('dddd, d MMM') + "</td><td>" + dWeather[3].weather[0].main + ", " + dWeather[3].weather[0].description + "</td><td>" + ((dWeather[3].temp.min-32)/1.8).toFixed(0) + "&#8451;/" + ((dWeather[3].temp.max-32)/1.8).toFixed(0) + "&#8451;</td><td>" + dWeather[3].wind_speed.toFixed(0) + "mph</td>")
-            $("#weather-4").html("<td>" + Date.parse("t + 4d").toString('dddd, d MMM') + "</td><td>" + dWeather[4].weather[0].main + ", " + dWeather[4].weather[0].description + "</td><td>" + ((dWeather[4].temp.min-32)/1.8).toFixed(0) + "&#8451;/" + ((dWeather[4].temp.max-32)/1.8).toFixed(0) + "&#8451;</td><td>" + dWeather[4].wind_speed.toFixed(0) + "mph</td>")
-            $("#weather-5").html("<td>" + Date.parse("t + 5d").toString('dddd, d MMM') + "</td><td>" + dWeather[5].weather[0].main + ", " + dWeather[5].weather[0].description + "</td><td>" + ((dWeather[5].temp.min-32)/1.8).toFixed(0) + "&#8451;/" + ((dWeather[5].temp.max-32)/1.8).toFixed(0) + "&#8451;</td><td>" + dWeather[5].wind_speed.toFixed(0) + "mph</td>")
-            $("#weather-6").html("<td>" + Date.parse("t + 6d").toString('dddd, d MMM') + "</td><td>" + dWeather[6].weather[0].main + ", " + dWeather[6].weather[0].description + "</td><td>" + ((dWeather[6].temp.min-32)/1.8).toFixed(0) + "&#8451;/" + ((dWeather[6].temp.max-32)/1.8).toFixed(0) + "&#8451;</td><td>" + dWeather[6].wind_speed.toFixed(0) + "mph</td>")   
-            $("#weather-7").html("<td>" + Date.parse("t + 7d").toString('dddd, d MMM') + "</td><td>" + dWeather[7].weather[0].main + ", " + dWeather[7].weather[0].description + "</td><td>" + ((dWeather[7].temp.min-32)/1.8).toFixed(0) + "&#8451;/" + ((dWeather[7].temp.max-32)/1.8).toFixed(0) + "&#8451;</td><td>" + dWeather[7].wind_speed.toFixed(0) + "mph</td>")
-                
+            for (let i=1; i<dWeather.length; i++) {
+              $("#weather-" + [i]).html("<td>" + Date.parse("t + " + [i] + "d").toString('dddd, d MMM') + "</td><td>" + dWeather[i].weather[0].main + ", " + dWeather[i].weather[0].description + "</td><td>" + ((dWeather[i].temp.min-32)/1.8).toFixed(0) + "&#8451;/" + ((dWeather[i].temp.max-32)/1.8).toFixed(0) + "&#8451;</td><td>" + dWeather[i].wind_speed.toFixed(0) + "mph</td>")
+            }
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -632,15 +623,11 @@ $(document).ready(function(){
   const win = $(window);
   if (win.width() <= 575) {
     $('.leaflet-control').css({'top': '95px'});
-    $('#infobox').css({'background-color': '#fff', 'padding' :'5px', 'opacity': '1', 'font': '12px/16px Arial, Helvetica, sans-serif', 'margin-bottom': '5px', 'top': '0', 'border-radius': '5px', 'box-shadow': '0 0 15px rgba(0, 0, 0, 0.3)'});
-    $('.legend').css({'color': '#212529', 'text-align' :'left'});
     $('.leaflet-control-attribution').css({'top': '0', 'text-align' :'left'});
     
 
   } else {
     $('.leaflet-control').css({'top': '55px'});
-    $('#infobox').css({'background-color': '#fff', 'padding' :'6px', 'font': '14px/18px Arial, Helvetica, sans-serif', 'box-shadow': '0 0 15px rgba(0, 0, 0, 0.3)', 'border-radius': '5px', 'opacity': '1', 'margin-bottom': '10px', 'top': '0'});
-    $('.legend').css({'color': '#212529', 'text-align' :'left'});
     $('.leaflet-control-attribution').css({'top': '0', 'text-align' :'left'});
   }
 })
@@ -649,12 +636,10 @@ $(window).on('resize', function(){
   const win = $(this); //this = window
   if (win.width() <= 575) {
     $('.leaflet-control').css({'top': '95px'});
-    $('#infobox').css({'padding' :'5px', 'margin-bottom': '5px', 'font': '12px/16px Arial, Helvetica, sans-serif', 'top': '0'});
     $('.leaflet-control-attribution').css({'top': '0', 'text-align' :'left'});
   }
   if (win.width() > 575 ) { 
     $('.leaflet-control').css({'top': '55px'});
-    $('#infobox').css({'padding' :'6px', 'font': '14px/18px Arial, Helvetica, sans-serif', 'margin-bottom': '10px', 'top': '0'});
     $('.leaflet-control-attribution').css({'top': '0', 'text-align' :'left'});
   }
 });
