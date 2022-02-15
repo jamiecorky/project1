@@ -34,9 +34,6 @@ const camIcon = L.ExtraMarkers.icon({
   prefix: 'fa'
 });
 
-
-
-
 const accessToken = 'cOYvUkIr2QTC1XUq4cllxAvdITUWUPMEJp9b84EhqypFuJabteMQtGFND8eBRj8n';
 
 // Map tiles 
@@ -45,7 +42,7 @@ const streets = L.tileLayer(
     attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a>',
     maxZoom: 22
   }
-)
+);
 const satellite = L.tileLayer('https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=vT8D4gm5ejB3f5qXd1Ap', {
   tileSize: 512,
   zoomOffset: -1,
@@ -53,8 +50,7 @@ const satellite = L.tileLayer('https://api.maptiler.com/tiles/satellite-v2/{z}/{
   attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a><a href="https://www.openstreetmap.org/copyright" target="_blank"> &copy; OpenStreetMap</a>',
   crossOrigin: true
   }
-)
-
+);
 
 const baseMaps = {
   "Satellite": satellite,
@@ -64,9 +60,9 @@ const baseMaps = {
 let yourLat = [];
 let yourLng = [];
 
-const corner1 = L.latLng(-90, -200)
-const corner2 = L.latLng(90, 200)
-const bounds = L.latLngBounds(corner1, corner2)
+const corner1 = L.latLng(-90, -200);
+const corner2 = L.latLng(90, 200);
+const bounds = L.latLngBounds(corner1, corner2);
 
 const map = L.map('map', {
   layers: [streets, satellite],
@@ -213,6 +209,7 @@ let cityMark = {};
 let cityGroup;
 let wikiGroup;
 let camGroup;
+let airportGroup;
 
 function removeCities() {
   if(cityGroup !== undefined) {
@@ -292,7 +289,7 @@ $('#country-select').change(function() {
     data: { code: countryVal },
     success: function(covid) {
       if (covid.status.name == "ok") {
-        console.log(covid)
+        // console.log(covid)
         $("#covid-header").html(countryName + " Covid-19 Statistics");
         $("#confirmed-data").html("<td><i class='fa-solid fa-chart-line'></i></td><td>Confirmed Cases</td><td>" + covid.data.confirmed.toLocaleString() + "</td>")
         $("#critical-data").html("<td><i class='fa-solid fa-bed-pulse'></i></td><td>Critical Cases</td><td>" + covid.data.critical.toLocaleString() + "</td>")
@@ -316,20 +313,36 @@ $('#country-select').change(function() {
         nStory = news.data.articles;
         console.log(news)
         $("#news-header").html(countryName + " Top News");
-        $("#news-story-0-img").html("<td><img class='rounded img-fluid' src ='" + (nStory[0].urlToImage ? nStory[0].urlToImage : "libs/img/news.jpg") + "'></td>")
-        $("#news-story-0-description").html("<td>" + nStory[0].title + "<br><a href='" + nStory[0].url + "' target = '_blank'>Read More...</a></td>");
-        $("#news-story-1-img").html("<td><img class='rounded img-fluid' src ='" + (nStory[1].urlToImage ? nStory[1].urlToImage : "libs/img/news.jpg") + "'></td>") 
-        $("#news-story-1-description").html("<td>" + nStory[1].title + "<br><a href='" + nStory[1].url + "' target = '_blank'>Read More...</a></td>");
-        $("#news-story-2-img").html("<td><img class='rounded img-fluid' src ='" + (nStory[2].urlToImage ? nStory[2].urlToImage : "libs/img/news.jpg") + "'></td>")
-        $("#news-story-2-description").html("<td>" + nStory[2].title + "<br><a href='" + nStory[2].url + "' target = '_blank'>Read More...</a></td>")
-        $("#news-story-3-img").html("<td><img class='rounded img-fluid' src ='" + (nStory[3].urlToImage ? nStory[3].urlToImage : "libs/img/news.jpg") + "'></td>")
-        $("#news-story-3-description").html("<td>" + nStory[3].title + "<br><a href='" + nStory[3].url + "' target = '_blank'>Read More...</a></td>");
-        $("#news-story-4-img").html("<td><img class='rounded img-fluid' src ='" + (nStory[4].urlToImage ? nStory[4].urlToImage : "libs/img/news.jpg") + "'></td>")
-        $("#news-story-4-description").html("<td>" + nStory[4].title + "<br><a href='" + nStory[4].url + "' target = '_blank'>Read More...</a></td>");
+
+        for (let i=0; i<5; i++) {
+          $("#holidays-header").html(countryName + " Public Holiday Dates");
+          $("#news-story-" + [i] + "-img").html("<td><img class='rounded img-fluid' src ='" + (nStory[i].urlToImage ? nStory[i].urlToImage : "libs/img/news.jpg") + "'></td>")          
+          $("#news-story-" + [i] + "-description").html("<td>" + nStory[i].title + "<br><a href='" + nStory[i].url + "' target = '_blank'>Read More...</a></td>");
+        }
       }
     },
     error: function(jqXHR, textStatus, errorThrown) {
       console.log('news error');
+    }
+  });   
+
+  $.ajax({
+    url: "libs/php/getHolidays.php",
+    type: 'POST',
+    dataType: 'json',
+    data: { code: countryVal },
+    success: function(holidays) {
+      if (holidays.status.name == "ok") {
+        console.log(holidays)
+
+        for (let i=0; i<holidays.data.length; i++) {
+          $("#holidays-header").html(countryName + " Public Holiday Dates");
+          $("#hol-row-" + [i]).html("<td>" + holidays.data[i].localName + "</td><td>" + Date.parse(holidays.data[i].date).toString("MMMM dS") + "</td>")
+        }
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log('holidays error');
     }
   });   
 
@@ -347,7 +360,7 @@ $('#country-select').change(function() {
             mapControl.removeLayer(camGroup)
           }
           camGroup = L.markerClusterGroup();
-          mapControl.addOverlay(camGroup, "Webcam markers");  
+          mapControl.addOverlay(camGroup, "Webcams");  
 
           let markers = [];
           for (let i = 0; i < camsData.length; i++) {
@@ -358,9 +371,7 @@ $('#country-select').change(function() {
           camGroup.addLayers(markers);
           map.addLayer(camGroup);
         
-        
         console.log(cams)
-
       }
     },
     error: function(jqXHR, textStatus, errorThrown) {
@@ -368,6 +379,37 @@ $('#country-select').change(function() {
     }
   });   
   
+  $.ajax({
+    url: "libs/php/getAirports.php",
+    type: 'POST',
+    dataType: 'json',
+    data: { code: countryVal },
+    success: function(airports) {
+      if (airports.status.name == "ok") {
+        airportData = airports.data.airports;
+        // console.log(airports)
+          if(airportGroup) {
+            airportGroup.clearLayers();
+            mapControl.removeLayer(airportGroup)
+          }
+          airportGroup = L.markerClusterGroup();
+          mapControl.addOverlay(airportGroup, "Airports");  
+
+          let markers = [];
+          for (let i = 0; i < airportData.length; i++) {
+            markers.push(L.marker([airportData[i].latitude, airportData[i].longitude], {icon: airportIcon}).on('click', markerOnClick)
+            .bindPopup("<b>" + airportData[i].name + "</b><br>"));
+          }
+
+          airportGroup.addLayers(markers);
+          map.addLayer(airportGroup);
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log('airports error');
+    }
+  });   
+
   $.ajax({
     url: "libs/php/getCountryBoundingBox.php",
     type: 'POST',
@@ -395,7 +437,7 @@ $('#country-select').change(function() {
                 mapControl.removeLayer(wikiGroup)
               }
               wikiGroup = L.markerClusterGroup();
-              mapControl.addOverlay(wikiGroup, "Wiki Pins");  
+              mapControl.addOverlay(wikiGroup, "Wikipedia");  
 
               let markers = [];
               for (let i = 0; i < result.data.length; i++) {
@@ -462,7 +504,7 @@ $('#country-select').change(function() {
       country: $('#country-select option:selected').val()
     },
     success: function(result) {
-      console.log(result)
+      // console.log(result)
       console.log('Get Country Info Call Success')
       let capitalLat = result.data.capitalInfo.latlng[0];
       let capitalLon = result.data.capitalInfo.latlng[1];
@@ -488,7 +530,6 @@ $('#country-select').change(function() {
         success: function(exchange){
           if (exchange.status.name == "ok") {
             console.log("Exchange Call Success");
-            console.log(result.data)
             const currenciesObject = result.data.currencies;
             const currencyOne = Object.keys(currenciesObject)[0];
             const currencyTwo = Object.keys(currenciesObject)[1];
@@ -542,9 +583,7 @@ $('#country-select').change(function() {
           // your error code
           console.log('error here')
         }
-      }); 
-
-      
+      });  
       
       if (result.status.name == "ok") {
         // console.log(result.data)
