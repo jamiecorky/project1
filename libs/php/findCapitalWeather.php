@@ -5,13 +5,7 @@
 
 	$executionStartTime = microtime(true);
 
-  /* Demo url has been split up and placeholder request text has been replaced with requests 
-  which will be concatenated together to make up the url request based on user input */
-
   $url='api.openweathermap.org/data/2.5/onecall?lat=' . $_REQUEST['lat'] . '&lon=' . $_REQUEST['lng'] . '&units=imperial&exclude=current,minutely,hourly,alerts&appid=8ca2889263e9e2e53b593d219dd9bf75';
-
-  //Test url - to make sure json request is working 
-  //$url='http://api.geonames.org/findNearByWeatherJSON?lat=37.451&lng=-122.18&username=jamiecorky'; 
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);

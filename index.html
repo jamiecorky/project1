@@ -86,81 +86,125 @@
     </div>
   </div>
 
-    <!-- Modal for covid data -->
-    <div class="modal fade" id="covid-modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <div class="country-flag"></div>
-            <h5 class="modal-title" id="covid-header"></h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>            
-          <table class="table table-striped table-hover modal-body table-borderless">
-            <tbody>
-              <tr id="confirmed-data"></tr>
-              <tr id="recovered-data"></tr>
-              <tr id="critical-data"></tr>
-              <tr id="deaths-data"></tr>
-            </tbody>
-          </table>
-        </div>
+  <!-- Modal for covid data -->
+  <div class="modal fade" id="covid-modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="country-flag"></div>
+          <h5 class="modal-title" id="covid-header"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>            
+        <table class="table table-striped table-hover modal-body table-borderless">
+          <tbody>
+            <tr id="confirmed-data"></tr>
+            <tr id="recovered-data"></tr>
+            <tr id="critical-data"></tr>
+            <tr id="deaths-data"></tr>
+          </tbody>
+        </table>
       </div>
     </div>
+  </div>
 
-        <!-- Modal for weather data -->
-        <div class="modal fade" id="weather-modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header">
-                <div class="country-flag"></div>
-                <h5 class="modal-title" id="weather-location"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>            
-              <table class="table table-striped table-hover modal-body table-borderless">
-                <tbody>
-                  <tr id="weather-key"></tr>
-                  <tr id="weather-0"></tr>
-                  <tr id="weather-1"></tr>
-                  <tr id="weather-2"></tr>
-                  <tr id="weather-3"></tr>
-                  <tr id="weather-4"></tr>
-                  <tr id="weather-5"></tr>
-                  <tr id="weather-6"></tr>
-                  <tr id="weather-7"></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+  <!-- Modal for weather data -->
+  <div class="modal fade" id="weather-modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="country-flag"></div>
+          <h5 class="modal-title" id="weather-location"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>            
+        <table class="table table-striped table-hover modal-body table-borderless">
+          <tbody>
+            <tr id="weather-key"></tr>
+            <tr id="weather-0"></tr>
+            <tr id="weather-1"></tr>
+            <tr id="weather-2"></tr>
+            <tr id="weather-3"></tr>
+            <tr id="weather-4"></tr>
+            <tr id="weather-5"></tr>
+            <tr id="weather-6"></tr>
+            <tr id="weather-7"></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-          <!-- Modal for news data -->
-          <div class="modal fade" id="news-modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <div class="country-flag"></div>
-                  <h5 class="modal-title" id="news-header"></h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>            
-                <table class="table modal-body table-borderless">
-                  <tbody>
-                    <tr id="news-story-0-img"></tr>
-                    <tr id="news-story-0-description"></tr>
-                    <tr id="news-story-1-img"></tr>
-                    <tr id="news-story-1-description"></tr>
-                    <tr id="news-story-2-img"></tr>
-                    <tr id="news-story-2-description"></tr>
-                    <tr id="news-story-3-img"></tr>
-                    <tr id="news-story-3-description"></tr>
-                    <tr id="news-story-4-img"></tr>
-                    <tr id="news-story-4-description"></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+  <!-- Modal for news data -->
+  <div class="modal fade" id="news-modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="country-flag"></div>
+          <h5 class="modal-title" id="news-header"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>            
+        <table class="table modal-body table-borderless">
+          <tbody>
+            <tr id="news-story-0-img"></tr>
+            <tr id="news-story-0-description"></tr>
+            <tr id="news-story-1-img"></tr>
+            <tr id="news-story-1-description"></tr>
+            <tr id="news-story-2-img"></tr>
+            <tr id="news-story-2-description"></tr>
+            <tr id="news-story-3-img"></tr>
+            <tr id="news-story-3-description"></tr>
+            <tr id="news-story-4-img"></tr>
+            <tr id="news-story-4-description"></tr>
+            <tr id="news-story-5-img"></tr>
+            <tr id="news-story-5-description"></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-          
+  <!-- Modal for holidays data -->
+  <div class="modal fade" id="holidays-modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="country-flag"></div>
+          <h5 class="modal-title" id="holidays-header"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>            
+        <table class="table table-striped table-hover modal-body table-borderless">
+          <tbody>
+            <tr id="hol-row-0"></tr>
+            <tr id="hol-row-1"></tr>
+            <tr id="hol-row-2"></tr>
+            <tr id="hol-row-3"></tr>
+            <tr id="hol-row-4"></tr>
+            <tr id="hol-row-5"></tr>
+            <tr id="hol-row-6"></tr>
+            <tr id="hol-row-7"></tr>
+            <tr id="hol-row-8"></tr>
+            <tr id="hol-row-9"></tr>
+            <tr id="hol-row-10"></tr>
+            <tr id="hol-row-11"></tr>
+            <tr id="hol-row-12"></tr>
+            <tr id="hol-row-13"></tr>
+            <tr id="hol-row-14"></tr>
+            <tr id="hol-row-15"></tr>
+            <tr id="hol-row-16"></tr>
+            <tr id="hol-row-17"></tr>
+            <tr id="hol-row-18"></tr>
+            <tr id="hol-row-19"></tr>
+            <tr id="hol-row-20"></tr>
+            <tr id="hol-row-21"></tr>
+            <tr id="hol-row-22"></tr>
+            <tr id="hol-row-23"></tr>
+            <tr id="hol-row-24"></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+    
 
 
   <script src="libs/js/jquery-2.2.3.min.js"></script>

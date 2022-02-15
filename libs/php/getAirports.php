@@ -5,7 +5,7 @@
 
 	$executionStartTime = microtime(true);
 
-  $url='api.openweathermap.org/data/2.5/weather?lat=' . $_REQUEST['lat'] . '&lon=' . $_REQUEST['lng'] . '&appid=5f81deec428e95a37f7dedb76aed8ec0';
+	$url='https://api.flightstats.com/flex/airports/rest/v1/json/countryCode/' . $_REQUEST['code'] . '?appId=3107b739&appKey=+b1befb98f6a43bd7109d7df50c2e452d&extendedOptions=excludeRailwayStations';
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
