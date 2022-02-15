@@ -8,14 +8,14 @@ $(window).on("load", function () {
 
 const cityIcon = L.ExtraMarkers.icon({
   icon: 'fa-solid fa-city',
-  markerColor: 'blue',
+  markerColor: 'pink',
   shape: 'penta',
   prefix: 'fa'
 });
 
 const wikiIcon = L.ExtraMarkers.icon({
   icon: 'fa-brands fa-wikipedia-w',
-  markerColor: 'orange',
+  markerColor: 'cyan',
   shape: 'square',
   prefix: 'fa'
 });
@@ -23,9 +23,17 @@ const wikiIcon = L.ExtraMarkers.icon({
 const airportIcon = L.ExtraMarkers.icon({
   icon: 'fa-solid fa-plane-departure',
   markerColor: 'green',
+  shape: 'star',
+  prefix: 'fa'
+});
+
+const camIcon = L.ExtraMarkers.icon({
+  icon: 'fa-solid fa-camera',
+  markerColor: 'orange',
   shape: 'circle',
   prefix: 'fa'
 });
+
 
 
 
@@ -204,6 +212,7 @@ let capitalMark = {};
 let cityMark = {};
 let cityGroup;
 let wikiGroup;
+let camGroup;
 
 function removeCities() {
   if(cityGroup !== undefined) {
@@ -307,20 +316,55 @@ $('#country-select').change(function() {
         nStory = news.data.articles;
         console.log(news)
         $("#news-header").html(countryName + " Top News");
-        $("#news-story-0-img").html("<td><img class='rounded img-fluid' src ='" + nStory[0].urlToImage + "'></td>");
+        $("#news-story-0-img").html("<td><img class='rounded img-fluid' src ='" + (nStory[0].urlToImage ? nStory[0].urlToImage : "libs/img/news.jpg") + "'></td>")
         $("#news-story-0-description").html("<td>" + nStory[0].title + "<br><a href='" + nStory[0].url + "' target = '_blank'>Read More...</a></td>");
-        $("#news-story-1-img").html("<td><img class='rounded img-fluid' src ='" + nStory[1].urlToImage + "'></td>"); 
+        $("#news-story-1-img").html("<td><img class='rounded img-fluid' src ='" + (nStory[1].urlToImage ? nStory[1].urlToImage : "libs/img/news.jpg") + "'></td>") 
         $("#news-story-1-description").html("<td>" + nStory[1].title + "<br><a href='" + nStory[1].url + "' target = '_blank'>Read More...</a></td>");
-        $("#news-story-2-img").html("<td><img class='rounded img-fluid' src ='" + nStory[2].urlToImage + "'></td>"); 
+        $("#news-story-2-img").html("<td><img class='rounded img-fluid' src ='" + (nStory[2].urlToImage ? nStory[2].urlToImage : "libs/img/news.jpg") + "'></td>")
         $("#news-story-2-description").html("<td>" + nStory[2].title + "<br><a href='" + nStory[2].url + "' target = '_blank'>Read More...</a></td>")
-        $("#news-story-3-img").html("<td><img class='rounded img-fluid' src ='" + nStory[3].urlToImage + "'></td>"); 
+        $("#news-story-3-img").html("<td><img class='rounded img-fluid' src ='" + (nStory[3].urlToImage ? nStory[3].urlToImage : "libs/img/news.jpg") + "'></td>")
         $("#news-story-3-description").html("<td>" + nStory[3].title + "<br><a href='" + nStory[3].url + "' target = '_blank'>Read More...</a></td>");
-        $("#news-story-4-img").html("<td><img class='rounded img-fluid' src ='" + nStory[4].urlToImage + "'></td>"); 
+        $("#news-story-4-img").html("<td><img class='rounded img-fluid' src ='" + (nStory[4].urlToImage ? nStory[4].urlToImage : "libs/img/news.jpg") + "'></td>")
         $("#news-story-4-description").html("<td>" + nStory[4].title + "<br><a href='" + nStory[4].url + "' target = '_blank'>Read More...</a></td>");
       }
     },
     error: function(jqXHR, textStatus, errorThrown) {
       console.log('news error');
+    }
+  });   
+
+  $.ajax({
+    url: "libs/php/getWebcams.php",
+    type: 'POST',
+    dataType: 'json',
+    data: { code: countryVal },
+    success: function(cams) {
+      if (cams.status.name == "ok") {
+        camsData = cams.data.result.webcams;
+
+          if(camGroup) {
+            camGroup.clearLayers();
+            mapControl.removeLayer(camGroup)
+          }
+          camGroup = L.markerClusterGroup();
+          mapControl.addOverlay(camGroup, "Webcam markers");  
+
+          let markers = [];
+          for (let i = 0; i < camsData.length; i++) {
+            markers.push(L.marker([camsData[i].location.latitude, camsData[i].location.longitude], {icon: camIcon}).on('click', markerOnClick)
+            .bindPopup("<b>" + camsData[i].title + "</b><br><img id='cam-img' src='" + camsData[i].image.current.thumbnail + "'>"));
+          }
+
+          camGroup.addLayers(markers);
+          map.addLayer(camGroup);
+        
+        
+        console.log(cams)
+
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log('cams error');
     }
   });   
   
@@ -350,10 +394,7 @@ $('#country-select').change(function() {
                 wikiGroup.clearLayers();
                 mapControl.removeLayer(wikiGroup)
               }
-
               wikiGroup = L.markerClusterGroup();
-
-              
               mapControl.addOverlay(wikiGroup, "Wiki Pins");  
 
               let markers = [];

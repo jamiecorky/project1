@@ -42,6 +42,12 @@ table {
 	margin-right: 10px;
 }
 
+#cam-img {
+	width: 100%;
+	height: auto;
+	padding-top: 10px;
+}
+
 #preloader {
 	position: fixed;
 	top: 0;
