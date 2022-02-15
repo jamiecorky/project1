@@ -6,6 +6,52 @@ $(window).on("load", function () {
   }
 });
 
+const accessToken = 'cOYvUkIr2QTC1XUq4cllxAvdITUWUPMEJp9b84EhqypFuJabteMQtGFND8eBRj8n';
+
+// Map tiles 
+const streets = L.tileLayer(`https://tile.jawg.io/jawg-streets/{z}/{x}/{y}.png?access-token=${accessToken}`, {
+  attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  maxZoom: 22,
+	subdomains: 'abcd'
+  }
+);
+
+const terrain = L.tileLayer(`https://{s}.tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token=${accessToken}`, {
+	attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	minZoom: 0,
+	maxZoom: 22,
+	subdomains: 'abcd'
+});
+
+// const satellite = L.tileLayer('https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=vT8D4gm5ejB3f5qXd1Ap', {
+//   tileSize: 512,
+//   zoomOffset: -1,
+//   minZoom: 1,
+//   attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a><a href="https://www.openstreetmap.org/copyright" target="_blank"> &copy; OpenStreetMap</a>',
+//   crossOrigin: true
+//   }
+// );
+
+const baseMaps = {
+  "Terrain": terrain,
+  "Streets": streets
+};
+
+// Setting the map bounds to stop people from zooming out 
+const corner1 = L.latLng(-90, -200);
+const corner2 = L.latLng(90, 200);
+const bounds = L.latLngBounds(corner1, corner2);
+
+
+const map = L.map('map', {
+  layers: [streets],
+  minZoom: 2,
+  maxBoundsViscosity: 1,
+  maxBounds: bounds
+});
+
+let mapControl = L.control.layers(baseMaps).addTo(map);
+
 const cityIcon = L.ExtraMarkers.icon({
   icon: 'fa-solid fa-city',
   markerColor: 'pink',
@@ -34,61 +80,25 @@ const camIcon = L.ExtraMarkers.icon({
   prefix: 'fa'
 });
 
-const accessToken = 'cOYvUkIr2QTC1XUq4cllxAvdITUWUPMEJp9b84EhqypFuJabteMQtGFND8eBRj8n';
+const countryButton = L.easyButton('fa-solid fa-info', function(btn, map){
+  $('#country-modal').modal('show');}).addTo(map);
 
-// Map tiles 
-const streets = L.tileLayer(
-  `https://tile.jawg.io/jawg-streets/{z}/{x}/{y}.png?access-token=${accessToken}`, {
-    attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a>',
-    maxZoom: 22
-  }
-);
-const satellite = L.tileLayer('https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=vT8D4gm5ejB3f5qXd1Ap', {
-  tileSize: 512,
-  zoomOffset: -1,
-  minZoom: 1,
-  attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a><a href="https://www.openstreetmap.org/copyright" target="_blank"> &copy; OpenStreetMap</a>',
-  crossOrigin: true
-  }
-);
+const weatherButton = L.easyButton('fa-solid fa-cloud-sun-rain', function(btn, map){
+  $('#weather-modal').modal('show');}).addTo(map);
+    
+const currencyButton = L.easyButton('fa-solid fa-coins', function(btn, map){
+  $('#currency-modal').modal('show');}).addTo(map);
 
-const baseMaps = {
-  "Satellite": satellite,
-  "Streets": streets
-};
+const covidButton = L.easyButton('fa-solid fa-virus-covid', function(btn, map){
+  $('#covid-modal').modal('show');}).addTo(map);
 
-let yourLat = [];
-let yourLng = [];
+const newsButton = L.easyButton('fa-solid fa-newspaper', function(btn, map){
+  $('#news-modal').modal('show');}).addTo(map);
 
-const corner1 = L.latLng(-90, -200);
-const corner2 = L.latLng(90, 200);
-const bounds = L.latLngBounds(corner1, corner2);
+const holidaysButton = L.easyButton('fa-solid fa-calendar-plus', function(btn, map){
+  $('#holidays-modal').modal('show');}).addTo(map);
 
-const map = L.map('map', {
-  layers: [streets, satellite],
-  minZoom: 2,
-  maxBoundsViscosity: 1,
-  maxBounds: bounds
-});
-
-let mapControl = L.control.layers(baseMaps).addTo(map);
-
-// Built in function for finding your location
-map.locate({setView: true, maxZoom: 16});
-
-// Function for when you are found on map to display pop up
-function onLocationFound(e) {
-  yourLat.push(e.latlng.lat);
-  yourLng.push(e.latlng.lng);
-}
-
-function onLocationError(e) {
-  alert(e.message);
-}
-
-map.on('locationerror', onLocationError);
-map.on('locationfound', onLocationFound);
-
+  
 function style(feature) {
   return {
     weight: 2,
@@ -97,7 +107,7 @@ function style(feature) {
     dashArray: '8',
     fillOpacity: 0.0,
     fillColor: '#FFFFFF'
-  };
+  }
 }
 
 function highlightFeature(e) {
@@ -133,8 +143,7 @@ function onEachFeature(feature, layer) {
   });  
 }
 
-function markerOnClick(e)
-{
+function markerOnClick(e) {
   var latLngs = [e.target.getLatLng()];
   var markerBounds = L.latLngBounds(latLngs);
   map.fitBounds(markerBounds);
@@ -153,32 +162,15 @@ const userPosition = { lat: '', lon: '' }
     }
 
  
+// When the document loads, the first 2 ajax calls first populate the select menu. Then the second updates it to the current country
 $('document').ready(function() {
-  // Ajax request to PHP to populate the nav select with countries
-  $.ajax({
-    url: "libs/php/getCurrentCountryCode.php",
-    type: 'POST',
-    dataType: 'json',
-    data: { lat: userPosition.lat, 
-            lng: userPosition.lon
-          },
-    success: function(result) {
-      if (result.status.name == "ok") {
-        $("#country-select").val(result.data.countryCode).change();
-      }
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      console.log('your lat lng error');
-    }
-  }); 
-
+  // Adds countries from GeoJSON to select menu - fixes some naming errors also
   $.ajax({
     url: "libs/php/getGeoJson.php",
     type: 'GET',
     dataType: 'json',
     success: function(result) {
       if (result.status.name == "ok") {
-        // Adds countries from GeoJSON to select menu - fixes some naming errors also
         for (let i = 0; i < result.data.length; i++) {
           if (result.data[i].iso_a3 !== '-99') {
             $('#country-select').append(`<option value=${result.data[i].iso_a2}>${result.data[i].name}</option>`);
@@ -196,6 +188,23 @@ $('document').ready(function() {
       console.log('error')
     }
   });
+  // Ajax request to PHP to change the select with current country
+  $.ajax({
+    url: "libs/php/getCurrentCountryCode.php",
+    type: 'POST',
+    dataType: 'json',
+    data: { lat: userPosition.lat, 
+            lng: userPosition.lon
+          },
+    success: function(result) {
+      if (result.status.name == "ok") {
+        $("#country-select").val(result.data.countryCode).change();
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log('your lat lng error');
+    }
+  }); 
 });
 
 
@@ -218,31 +227,9 @@ function removeCities() {
   }
 }
 
-function dayOfWeekAsString(dayIndex) {
-  return ["Sunday", "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][dayIndex] || '';
-}
-
 function addCities() {
   cityGroup = L.markerClusterGroup();
 }
-
-const countryButton = L.easyButton('fa-solid fa-info', function(btn, map){
-  $('#country-modal').modal('show');}).addTo(map);
-
-const weatherButton = L.easyButton('fa-solid fa-cloud-sun-rain', function(btn, map){
-  $('#weather-modal').modal('show');}).addTo(map);
-    
-const currencyButton = L.easyButton('fa-solid fa-coins', function(btn, map){
-$('#currency-modal').modal('show');}).addTo(map);
-
-const covidButton = L.easyButton('fa-solid fa-virus-covid', function(btn, map){
-  $('#covid-modal').modal('show');}).addTo(map);
-
-const newsButton = L.easyButton('fa-solid fa-newspaper', function(btn, map){
-  $('#news-modal').modal('show');}).addTo(map);
-
-const holidaysButton = L.easyButton('fa-solid fa-calendar-plus', function(btn, map){
-  $('#holidays-modal').modal('show');}).addTo(map);
 
 // Changes the boundary on the map to match the selected location
 $('#country-select').change(function() {
@@ -282,6 +269,8 @@ $('#country-select').change(function() {
     }
   }); 
 
+  
+
   $.ajax({
     url: "libs/php/getCovidData.php",
     type: 'POST',
@@ -312,8 +301,7 @@ $('#country-select').change(function() {
       if (news.status.name == "ok") {
         nStory = news.data.articles;
         console.log(news)
-        $("#news-header").html(countryName + " Top News");
-
+        $("#news-header").html(countryName + " Top News");  
         for (let i=0; i<5; i++) {
           $("#holidays-header").html(countryName + " Public Holiday Dates");
           $("#news-story-" + [i] + "-img").html("<td><img class='rounded img-fluid' src ='" + (nStory[i].urlToImage ? nStory[i].urlToImage : "libs/img/news.jpg") + "'></td>")          
@@ -561,7 +549,6 @@ $('#country-select').change(function() {
           if (result.status.name == "ok") {
             const dWeather= weather.data.daily;
             // console.log(dWeather)
-
             $("#weather-location").html(result.data.capital + " 7 Day Weather Forecast");
             $("#weather-key").html("<td>Day</td><td>Weather</td><td>Min/Max</td><td>Wind</td></b>")
             $("#weather-0").html("<td>Today" + Date.parse("t").toString(', d MMM') + "</td><td>" + dWeather[0].weather[0].main + ", " + dWeather[0].weather[0].description + "</td><td>" + ((dWeather[0].temp.min-32)/1.8).toFixed(0) + "&#8451;/" + ((dWeather[0].temp.max-32)/1.8).toFixed(0) + "&#8451;</td><td>" + dWeather[0].wind_speed.toFixed(0) + "mph</td>")
@@ -584,38 +571,6 @@ $('#country-select').change(function() {
       console.log('Error In Get Country Info Call');
     }  
   });
-  
-  $.ajax({
-    url: "libs/php/getCountryBorders.php",
-    type: 'POST',
-    dataType: 'json',
-    data: { name: countryName, 
-            value: countryVal
-          },
-    success: function(result) {
-      if (result.status.name == "ok") {
-        //console.log(result)
-        myGeoJSON.push(result.returnBorder[0])
-        nameSelected.push(result.returnName);
-        if(geojson){
-          geojson.clearLayers();
-        }
-        geojson = L.geoJson(myGeoJSON, {
-          style: style,
-          onEachFeature: onEachFeature
-        }).addTo(map);
-        map.fitBounds(geojson.getBounds());
-        // Removes previous results from array so [0] is always the new result
-        if (myGeoJSON.length >= 1) {
-          myGeoJSON.shift();
-          nameSelected.shift();
-        }      
-      }
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      console.log('Ajax border error');
-    }
-  }); 
 });
 
 // Styles
