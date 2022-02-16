@@ -39,12 +39,11 @@ const camIcon = L.ExtraMarkers.icon({
 const accessToken = 'cOYvUkIr2QTC1XUq4cllxAvdITUWUPMEJp9b84EhqypFuJabteMQtGFND8eBRj8n';
 
 // Map tiles 
-const streets = L.tileLayer(
-  `https://tile.jawg.io/jawg-streets/{z}/{x}/{y}.png?access-token=${accessToken}`, {
-  attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a>',
-  maxZoom: 22
-}
-);
+const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+});
+
 
 const satellite = L.tileLayer('https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=vT8D4gm5ejB3f5qXd1Ap', {
   tileSize: 512,
@@ -167,6 +166,7 @@ $('document').ready(function () {
     dataType: 'json',
     success: function (result) {
       if (result.status.name == "ok") {
+        console.log('populate select success');
         for (let i = 0; i < result.data.length; i++) {
           if (result.data[i].iso_a3 !== '-99') {
             $('#country-select').append(`<option value=${result.data[i].iso_a2}>${result.data[i].name}</option>`);
@@ -190,6 +190,7 @@ $('document').ready(function () {
         },
         success: function (result) {
           if (result.status.name == "ok") {
+            console.log('change select to location success')
             $("#country-select").val(result.data.countryCode).change();
           }
         },
@@ -244,7 +245,7 @@ $('#country-select').change(function () {
     },
     success: function (result) {
       if (result.status.name == "ok") {
-        //console.log(result)
+        console.log('country borders success')
         myGeoJSON.push(result.returnBorder[0])
         nameSelected.push(result.returnName);
         if (geojson) {
@@ -263,7 +264,7 @@ $('#country-select').change(function () {
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.log('Ajax border error');
+      console.log(jqXHR, textStatus, errorThrown);
     }
   });
 
@@ -274,7 +275,7 @@ $('#country-select').change(function () {
     data: { code: countryVal },
     success: function (covid) {
       if (covid.status.name == "ok") {
-        // console.log(covid)
+        console.log('covid data success')
         $("#covid-header").html(countryName + " Covid-19 Statistics");
         $("#confirmed-data").html("<td><i class='fa-solid fa-chart-line'></i></td><td>Confirmed Cases</td><td>" + covid.data.confirmed.toLocaleString() + "</td>")
         $("#critical-data").html("<td><i class='fa-solid fa-bed-pulse'></i></td><td>Critical Cases</td><td>" + covid.data.critical.toLocaleString() + "</td>")
@@ -296,7 +297,7 @@ $('#country-select').change(function () {
     success: function (news) {
       if (news.status.name == "ok") {
         nStory = news.data.articles;
-        console.log(news)
+        //console.log(news)
         $("#news-header").html(countryName + " Top News");
 
         for (let i = 0; i < 5; i++) {
@@ -307,7 +308,7 @@ $('#country-select').change(function () {
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.log('news error');
+      console.log(jqXHR, textStatus, errorThrown);
     }
   });
 
@@ -318,7 +319,7 @@ $('#country-select').change(function () {
     data: { code: countryVal },
     success: function (holidays) {
       if (holidays.status.name == "ok") {
-        console.log(holidays)
+        //console.log(holidays)
 
         for (let i = 0; i < holidays.data.length; i++) {
           $("#holidays-header").html(countryName + " Public Holiday Dates");
@@ -327,7 +328,7 @@ $('#country-select').change(function () {
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.log('holidays error');
+      console.log(jqXHR, textStatus, errorThrown);
     }
   });
 
@@ -358,7 +359,7 @@ $('#country-select').change(function () {
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.log('cams error');
+      console.log(jqXHR, textStatus, errorThrown);
     }
   });
 
@@ -389,7 +390,7 @@ $('#country-select').change(function () {
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.log('airports error');
+      console.log(jqXHR, textStatus, errorThrown);
     }
   });
 
@@ -433,7 +434,7 @@ $('#country-select').change(function () {
             }
           },
           error: function (jqXHR, textStatus, errorThrown) {
-            console.log('error here')
+            console.log(jqXHR, textStatus, errorThrown)
           }
         });
 
@@ -467,13 +468,13 @@ $('#country-select').change(function () {
             }
           },
           error: function (jqXHR, textStatus, errorThrown) {
-            console.log('error here')
+            console.log(jqXHR, textStatus, errorThrown)
           }
         });
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.log('error getting bounding box')
+      console.log(jqXHR, textStatus, errorThrown)
     }
   });
 
@@ -527,7 +528,7 @@ $('#country-select').change(function () {
           }
         },
         error: function (jqXHR, textStatus, errorThrown) {
-          console.log('Error Currency In Rates Call');
+          console.log(jqXHR, textStatus, errorThrown);
         }
       });
 
@@ -561,7 +562,7 @@ $('#country-select').change(function () {
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.log('Error In Get Country Info Call');
+      console.log(jqXHR, textStatus, errorThrown);
     }
   });
 
