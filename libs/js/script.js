@@ -34,8 +34,6 @@ const camIcon = L.ExtraMarkers.icon({
   prefix: 'fa'
 });
 
-
-
 const accessToken = 'cOYvUkIr2QTC1XUq4cllxAvdITUWUPMEJp9b84EhqypFuJabteMQtGFND8eBRj8n';
 
 // Map tiles 
@@ -43,7 +41,6 @@ const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
   maxZoom: 19,
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });
-
 
 const satellite = L.tileLayer('https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=vT8D4gm5ejB3f5qXd1Ap', {
   tileSize: 512,
@@ -58,7 +55,6 @@ const baseMaps = {
   "Satellite": satellite,
   "Streets": streets
 };
-
 
 const corner1 = L.latLng(-90, -200);
 const corner2 = L.latLng(90, 200);
@@ -153,6 +149,25 @@ if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(function (position) {
     userPosition.lat = position.coords.latitude;
     userPosition.lon = position.coords.longitude;
+    // Ajax request to PHP to change the select with current country
+    $.ajax({
+      url: "libs/php/getCurrentCountryCode.php",
+      type: 'POST',
+      dataType: 'json',
+      data: {
+        lat: userPosition.lat,
+        lng: userPosition.lon
+      },
+      success: function (result) {
+        if (result.status.name == "ok") {
+          console.log('change select to location success')
+          $("#country-select").val(result.data.countryCode).change();
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log('your lat lng error');
+      }
+    });
   });
 } else {
   alert("Geolocation not supported by your browser");
@@ -179,31 +194,11 @@ $('document').ready(function () {
           }
         }
       }
-      // Ajax request to PHP to change the select with current country
-      $.ajax({
-        url: "libs/php/getCurrentCountryCode.php",
-        type: 'POST',
-        dataType: 'json',
-        data: {
-          lat: userPosition.lat,
-          lng: userPosition.lon
-        },
-        success: function (result) {
-          if (result.status.name == "ok") {
-            console.log('change select to location success')
-            $("#country-select").val(result.data.countryCode).change();
-          }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          console.log('your lat lng error');
-        }
-      });
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.log('error')
     }
   });
-
 });
 
 // Global variables
@@ -565,39 +560,6 @@ $('#country-select').change(function () {
       console.log(jqXHR, textStatus, errorThrown);
     }
   });
-
-  // $.ajax({
-  //   url: "libs/php/getCountryBorders.php",
-  //   type: 'POST',
-  //   dataType: 'json',
-  //   data: {
-  //     name: countryName,
-  //     value: countryVal
-  //   },
-  //   success: function (result) {
-  //     if (result.status.name == "ok") {
-  //       //console.log(result)
-  //       myGeoJSON.push(result.returnBorder[0])
-  //       nameSelected.push(result.returnName);
-  //       if (geojson) {
-  //         geojson.clearLayers();
-  //       }
-  //       geojson = L.geoJson(myGeoJSON, {
-  //         style: style,
-  //         onEachFeature: onEachFeature
-  //       }).addTo(map);
-  //       map.fitBounds(geojson.getBounds());
-  //       // Removes previous results from array so [0] is always the new result
-  //       if (myGeoJSON.length >= 1) {
-  //         myGeoJSON.shift();
-  //         nameSelected.shift();
-  //       }
-  //     }
-  //   },
-  //   error: function (jqXHR, textStatus, errorThrown) {
-  //     console.log('Ajax border error');
-  //   }
-  // });
 });
 
 // Styles
