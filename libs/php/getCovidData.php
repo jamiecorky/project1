@@ -1,31 +1,29 @@
 <?php
 
-	ini_set('display_errors', 'On');
-	error_reporting(E_ALL);
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
-	$executionStartTime = microtime(true);
+$executionStartTime = microtime(true);
 
-	$url='https://covid19-api.com/country/code?code=' . $_REQUEST['code'] . '&format=json';
+$url = 'https://corona.dnsforfamily.com/graph.png/?c=' . $_REQUEST['code'];
 
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_URL,$url);
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_URL, $url);
 
-	$result=curl_exec($ch);
+$result = curl_exec($ch);
 
-	curl_close($ch);
+curl_close($ch);
 
-	$decode = json_decode($result,true);	
+$decode = json_decode($result, true);
 
-	$output['status']['code'] = "200";
-	$output['status']['name'] = "ok";
-	$output['status']['description'] = "success";
-	$output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-	$output['data'] = $decode[0];
-	
-	header('Content-Type: application/json; charset=UTF-8');
+$output['status']['code'] = "200";
+$output['status']['name'] = "ok";
+$output['status']['description'] = "success";
+$output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
+$output['data'] = $url;
 
-	echo json_encode($output); 
+header('Content-Type: application/json; charset=UTF-8');
 
-?>
+echo json_encode($output);

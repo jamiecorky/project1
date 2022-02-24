@@ -15,10 +15,10 @@
 	font-weight: normal;
 	font-style: normal;
 }
-.fa {
+/* .fa {
 	display: inline-block;
 	font: normal normal normal 14px/1 FontAwesome;
-	font-size: 16px;
+	font-size: inherit;
 	text-rendering: auto;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -2334,4 +2334,4 @@
 	margin: 0;
 	overflow: visible;
 	clip: auto;
-}
+} */
