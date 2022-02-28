@@ -193,7 +193,7 @@ $(document).ready(function () {
     dataType: 'json',
     success: function (result) {
       if (result.status.name == "ok") {
-        console.log('populate select success');
+        //console.log('populate select success');
         for (let i = 0; i < result.data.length; i++) {
           if (result.data[i].iso_a3 !== '-99') {
             $('#country-select').append(`<option value=${result.data[i].iso_a2}>${result.data[i].name}</option>`);
@@ -209,7 +209,7 @@ $(document).ready(function () {
       const userPosition = {};
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
-          console.log("user gave location");
+          //console.log("user gave location");
           userPosition.lat = position.coords.latitude;
           userPosition.lon = position.coords.longitude;
           $.ajax({
@@ -222,16 +222,16 @@ $(document).ready(function () {
             },
             success: function (result) {
               if (result.status.name == "ok") {
-                console.log('change select to location success')
+                //console.log('change select to location success')
                 $("#country-select").val(result.data.countryCode).change();
               }
             },
             error: function (jqXHR, textStatus, errorThrown) {
-              console.log('your lat lng error');
+              //console.log('your lat lng error');
             }
           });
         }, function () {
-          console.log("user refused location");
+          //console.log("user refused location");
           userPosition.lat = 51.509865;
           userPosition.lon = -0.118092;
           $.ajax({
@@ -244,13 +244,13 @@ $(document).ready(function () {
             },
             success: function (result) {
               if (result.status.name == "ok") {
-                console.log('change select to location success')
+                //console.log('change select to location success')
                 $("#country-select").val(result.data.countryCode).change();
               }
             },
             error: function (jqXHR, textStatus, errorThrown) {
-              console.log('your lat lng error');
-              console.log(jqXHR);
+              //console.log('your lat lng error');
+              //console.log(jqXHR);
             }
           });
         });
@@ -259,7 +259,7 @@ $(document).ready(function () {
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.log(jqXHR);
+      //console.log(jqXHR);
     }
   });
 
@@ -276,7 +276,7 @@ $(document).ready(function () {
 
   // Changes the boundary on the map to match the selected location
   $('#country-select').change(function () {
-    console.log(addCities);
+    //console.log(addCities);
     const countryName = $('#country-select option:selected').text();
     const countryVal = $('#country-select option:selected').val();
 
@@ -305,7 +305,7 @@ $(document).ready(function () {
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR, textStatus, errorThrown);
+        //console.log(jqXHR, textStatus, errorThrown);
       }
     });
 
@@ -316,8 +316,8 @@ $(document).ready(function () {
       data: { code: countryVal },
       success: function (covid) {
         if (covid.status.name == "ok") {
-          console.log('covid data success')
-          console.log(covid)
+          //console.log('covid data success')
+          //console.log(covid)
 
           $("#covid-header").html(countryName + " Covid-19 Statistics");
           $("#covid-graph").append(`<img id=covid-img src='${covid.data}'>`);
@@ -329,8 +329,8 @@ $(document).ready(function () {
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log('covid error');
-        console.log(jqXHR);
+        //console.log('covid error');
+        //console.log(jqXHR);
       }
     });
 
@@ -353,7 +353,7 @@ $(document).ready(function () {
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR, textStatus, errorThrown);
+        //console.log(jqXHR, textStatus, errorThrown);
       }
     });
 
@@ -373,7 +373,7 @@ $(document).ready(function () {
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR, textStatus, errorThrown);
+        //console.log(jqXHR, textStatus, errorThrown);
       }
     });
 
@@ -404,7 +404,7 @@ $(document).ready(function () {
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR, textStatus, errorThrown);
+        //console.log(jqXHR, textStatus, errorThrown);
       }
     });
 
@@ -435,7 +435,7 @@ $(document).ready(function () {
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR, textStatus, errorThrown);
+        //console.log(jqXHR, textStatus, errorThrown);
       }
     });
 
@@ -479,7 +479,7 @@ $(document).ready(function () {
               }
             },
             error: function (jqXHR, textStatus, errorThrown) {
-              console.log(jqXHR, textStatus, errorThrown)
+              //console.log(jqXHR, textStatus, errorThrown)
             }
           });
 
@@ -513,13 +513,13 @@ $(document).ready(function () {
               }
             },
             error: function (jqXHR, textStatus, errorThrown) {
-              console.log(jqXHR, textStatus, errorThrown)
+              //console.log(jqXHR, textStatus, errorThrown)
             }
           });
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR, textStatus, errorThrown)
+        //console.log(jqXHR, textStatus, errorThrown)
       }
     });
 
@@ -532,7 +532,7 @@ $(document).ready(function () {
         country: $('#country-select option:selected').val()
       },
       success: function (result) {
-        console.log('Get Country Info Call Success')
+        //console.log('Get Country Info Call Success')
         const populationMil = (result.data.population / 1000000).toFixed(1);
         const Languages = result.data.languages;
         const startOfWeek = result.data.startOfWeek.charAt(0).toUpperCase() + result.data.startOfWeek.slice(1)
@@ -554,7 +554,7 @@ $(document).ready(function () {
           dataType: "json",
           success: function (exchange) {
             if (exchange.status.name == "ok") {
-              console.log("Exchange Call Success");
+              //console.log("Exchange Call Success");
               const currenciesObject = result.data.currencies;
               const currencyOne = Object.keys(currenciesObject)[0];
               const currencyTwo = Object.keys(currenciesObject)[1];
@@ -573,7 +573,7 @@ $(document).ready(function () {
             }
           },
           error: function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR, textStatus, errorThrown);
+            //console.log(jqXHR, textStatus, errorThrown);
           }
         });
 
@@ -598,16 +598,16 @@ $(document).ready(function () {
             }
           },
           error: function (jqXHR, textStatus, errorThrown) {
-            console.log('error here')
+            //console.log('error here')
           }
         });
 
         if (result.status.name == "ok") {
-          // console.log(result.data)
+          //console.log(result.data)
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR, textStatus, errorThrown);
+        //console.log(jqXHR, textStatus, errorThrown);
       }
     });
   });
